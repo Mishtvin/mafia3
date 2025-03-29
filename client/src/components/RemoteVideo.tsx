@@ -10,15 +10,14 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Основной эффект для подключения и запуска видео
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !stream) return;
 
     console.log(`🎥 RemoteVideo setup for ${participantId}`);
 
-    video.srcObject = null; 
-    video.srcObject = stream;
-
+    // Проверка трека
     const videoTrack = stream.getVideoTracks()[0];
     if (videoTrack) {
       console.log(`🔍 Track details for ${participantId}:`, {
@@ -27,51 +26,70 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         muted: videoTrack.muted,
         readyState: videoTrack.readyState
       });
+      
+      // Гарантируем, что трек включен
+      videoTrack.enabled = true;
     }
 
+    video.srcObject = stream;
+    
+    // Обработчик загрузки метаданных
     video.onloadedmetadata = () => {
-      console.log(`✅ Metadata for ${participantId}:`, {
-        w: video.videoWidth,
-        h: video.videoHeight,
-      });
-
+      console.log(`🔍 onloadedmetadata triggered for ${participantId}`);
+      
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        console.log(`🎥 Track details on load:`, {
+          id: track.id,
+          kind: track.kind,
+          enabled: track.enabled,
+          muted: track.muted,
+          readyState: track.readyState,
+          dimensions: `${video.videoWidth}x${video.videoHeight}`
+        });
+  
+        // Попытка принудительного воспроизведения
+        track.enabled = true;
+  
+        // Обязательно вызвать load() перед play()
+        video.load();
+        video
+          .play()
+          .then(() => {
+            console.log(`▶️ Video play() successful for ${participantId}`);
+            setIsVideoReady(true);
+          })
+          .catch((err) => console.warn(`⚠️ Video play() failed for ${participantId}:`, err));
+      }
+      
+      // Проверяем наличие размеров и устанавливаем готовность
       if (video.videoWidth > 0 && video.videoHeight > 0) {
         setIsVideoReady(true);
       }
-
-      const track = stream.getVideoTracks()[0];
-      if (track && track.muted) {
-        console.log(`⚙️ Forcing unmute on track for ${participantId}`);
-        track.enabled = true;
-        
+    };
+  
+    // Fallback в случае если onloadedmetadata не сработает
+    setTimeout(() => {
+      if (video.readyState < 2) {
+        console.log(`⌛ Video not ready for ${participantId}, forcing play()`);
         video.load();
-        video.play().catch(err => {
-          console.warn(`⚠️ Failed to play video after unmute attempt for ${participantId}:`, err);
-        });
+        video
+          .play()
+          .then(() => {
+            console.log(`▶️ Video force-play() OK for ${participantId}`);
+            setIsVideoReady(true);
+          })
+          .catch((err) => console.warn(`⚠️ Video force-play() failed:`, err));
       }
-    };
-
-    const tryPlay = () => {
-      video.load();
-      video
-        .play()
-        .then(() => {
-          console.log(`▶️ Playing for ${participantId}`);
-          setIsVideoReady(true);
-        })
-        .catch((err) => {
-          console.warn(`⚠️ play() failed for ${participantId}`, err);
-        });
-    };
-
-    setTimeout(tryPlay, 150);
+    }, 500);
 
     return () => {
       video.onloadedmetadata = null;
       video.srcObject = null;
     };
-  }, [stream]);
+  }, [stream, participantId]);
 
+  // Отладочный эффект с canvas для проверки, приходят ли кадры
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -80,17 +98,20 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Настройка canvas
     canvas.width = 160;
     canvas.height = 120;
 
     console.log(`🖼️ Canvas debug started for ${participantId}`);
 
+    // Функция для рисования кадра
     const drawFrame = () => {
       try {
         if (video.videoWidth > 0 && video.videoHeight > 0) {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           console.log(`🎨 Drew frame for ${participantId}: ${video.videoWidth}x${video.videoHeight}`);
         } else {
+          // Рисуем красный крест если нет размеров
           ctx.fillStyle = 'black';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.strokeStyle = 'red';
@@ -107,6 +128,7 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       }
     };
 
+    // Запускаем интервал для отрисовки
     const interval = setInterval(drawFrame, 500);
 
     return () => {
@@ -129,7 +151,7 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         ref={videoRef}
         autoPlay
         playsInline
-        muted
+        // muted -- Временно отключаем мутирование для проверки
         style={{
           width: '100%',
           height: '100%',
@@ -142,6 +164,7 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         }}
       />
 
+      {/* Отладочный canvas для проверки кадров */}
       <canvas
         ref={canvasRef}
         style={{

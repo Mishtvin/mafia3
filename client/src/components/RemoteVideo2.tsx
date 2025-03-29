@@ -41,6 +41,8 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
     videoElement.onloadeddata = () => {
       console.log(`RemoteVideo: Video data loaded for ${participantId}`);
       setHasVideo(true);
+      // Если данные загрузились, видео точно не должно быть muted
+      setIsVideoMuted(false);
     };
     
     videoElement.onplaying = () => {
@@ -195,6 +197,15 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
           <div className="text-red-600 font-bold text-5xl border-2 border-red-600 px-6 py-3 rounded transform -rotate-12">
             ВБИТО
           </div>
+        </div>
+      )}
+      
+      {/* Отладочная информация в режиме разработки */}
+      {true && (  // Всегда показывать в режиме разработки
+        <div className="absolute top-1 left-1 text-white text-xs bg-black bg-opacity-60 px-2 py-1 rounded">
+          hasVideo: {hasVideo ? 'true' : 'false'}<br />
+          videoMuted: {isVideoMuted ? 'true' : 'false'}<br />
+          audioMuted: {isAudioMuted ? 'true' : 'false'}
         </div>
       )}
       

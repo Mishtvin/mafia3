@@ -14,6 +14,8 @@ export enum MessageType {
   PRODUCER_CLOSED = 'producer-closed',
   CONNECT_TRANSPORT = 'connect-transport',
   PRODUCE = 'produce',
+  NICKNAME_CHANGE = 'nickname-change',
+  PARTICIPANT_KILLED = 'participant-killed',
 }
 
 // Base message interface
@@ -54,6 +56,14 @@ export interface ProducerClosedMessage extends SignalingMessage {
   producerId: string;
 }
 
+// Nickname change message
+export interface NicknameChangeMessage extends SignalingMessage {
+  type: MessageType.NICKNAME_CHANGE;
+  nickname: string;
+  previousName?: string;
+  isLocalChange?: boolean; // true if this is a local notification only
+}
+
 // Connect transport message
 export interface ConnectTransportMessage extends SignalingMessage {
   type: MessageType.CONNECT_TRANSPORT;
@@ -91,9 +101,16 @@ export interface ConsumeResponse {
   rtpParameters: any;
 }
 
+// Participant killed message
+export interface ParticipantKilledMessage extends SignalingMessage {
+  type: MessageType.PARTICIPANT_KILLED;
+  killed: boolean; // true = killed, false = revived
+}
+
 // Participant type
 export interface Participant {
   id: string;
   producerId?: string;
   consumerIds: string[];
+  isKilled?: boolean;
 }

@@ -69,8 +69,8 @@ const config = {
   webRtcTransport: {
     listenIps: [
       {
-        ip: '0.0.0.0',
-      announcedIp: '45.14.246.195',  // Replace with your public IP in production
+        ip: '0.0.0.0',      // Replace with your local IP in production, or use 0.0.0.0 for all interfaces
+        announcedIp: null,  // Replace with your public IP in production
       }
     ],
     maxIncomingBitrate: 1500000,

@@ -10,6 +10,14 @@ import {
   ProduceMessage,
   RequestConsumeMessage
 } from "@shared/types";
+
+// Расширение типа WebSocket для поддержки heartbeat
+declare module "ws" {
+  interface WebSocket {
+    isAlive: boolean;
+    lastActivity: number;
+  }
+}
 import * as mediasoup from "./mediasoup";
 
 interface Room {
@@ -17,6 +25,7 @@ interface Room {
     socket: WebSocket;
     producerId?: string;
     rtpCapabilities?: any; // Store client's RTP capabilities for consumer creation
+    isKilled?: boolean; // Track if participant is marked as killed
   }>;
 }
 
@@ -43,6 +52,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       callback(true); 
     }
   });
+  
+  // Настройка пинг/понг для поддержания активности соединений
+  const PING_INTERVAL = 30000; // 30 секунд
+  const CONNECTION_TIMEOUT = 60000; // 60 секунд бездействия до отключения
+  
+  // Регулярно отправлять пинги для поддержания активных соединений
+  const heartbeatInterval = setInterval(() => {
+    wss.clients.forEach((socket) => {
+      // Для каждого клиента устанавливаем флаг для проверки отзывчивости
+      if (socket.isAlive === false) {
+        console.log(`Terminating unresponsive WebSocket connection`);
+        return socket.terminate();
+      }
+      
+      // Отмечаем как неактивный до получения понга
+      socket.isAlive = false;
+      // Отправляем пинг
+      socket.ping();
+    });
+  }, PING_INTERVAL);
+  
+  // Очистка интервала при закрытии сервера
+  wss.on('close', () => {
+    clearInterval(heartbeatInterval);
+  });
 
   // Ensure default room exists
   if (!rooms.has(defaultRoom)) {
@@ -52,6 +86,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   wss.on('connection', async (socket, request) => {
+    // Инициализация состояния соединения для нового клиента
+    socket.isAlive = true;
+    socket.lastActivity = Date.now();
+    
+    // Обработчик понг-ответов от клиента
+    socket.on('pong', () => {
+      socket.isAlive = true;
+      socket.lastActivity = Date.now();
+    });
+    
     // Generate a unique ID for this participant
     const participantId = generateParticipantId();
     let currentRoom: Room | null = null;
@@ -73,6 +117,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await handleLeave(participantId);
             break;
             
+          case MessageType.NICKNAME_CHANGE:
+            // Обработка изменения имени
+            if (currentRoomId && currentRoom) {
+              // Получаем данные из сообщения
+              const nicknameData = data as { nickname: string, previousName?: string };
+              
+              console.log(`Participant ${participantId} changed nickname to: ${nicknameData.nickname}`);
+              
+              // Уведомляем всех остальных участников в комнате
+              notifyParticipants(currentRoom, participantId, {
+                type: 'nickname-change',
+                data: {
+                  participantId,
+                  nickname: nicknameData.nickname,
+                  previousName: nicknameData.previousName
+                }
+              });
+              
+              // Посылаем подтверждение обратно отправителю
+              sendToClient(socket, {
+                type: 'nickname-change',
+                data: {
+                  participantId,
+                  nickname: nicknameData.nickname,
+                  previousName: nicknameData.previousName,
+                  isLocalChange: true
+                }
+              });
+            }
+            break;
+            
           case MessageType.CONNECT_TRANSPORT:
             await mediasoup.connectTransport(data.transportId, data.dtlsParameters);
             break;
@@ -83,6 +158,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
           case MessageType.REQUEST_CONSUME:
             await handleConsume(data as RequestConsumeMessage, socket, participantId);
+            break;
+          
+          case 'ping':
+            // Принимаем пинг от клиента и обновляем его статус активности
+            socket.isAlive = true;
+            socket.lastActivity = Date.now();
+            // По желанию можно отправить понг в ответ
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.send(JSON.stringify({ type: 'pong' }));
+            }
+            break;
+            
+          case MessageType.PARTICIPANT_KILLED:
+            // Обработка статуса "убит"
+            if (currentRoomId && currentRoom) {
+              // Получаем данные из сообщения
+              const killedData = data as { killed: boolean };
+              
+              // Находим участника
+              const participant = currentRoom.participants.get(participantId);
+              if (participant) {
+                // Обновляем статус
+                participant.isKilled = killedData.killed;
+                
+                console.log(`Participant ${participantId} is now ${killedData.killed ? 'killed' : 'alive'}`);
+                
+                // Уведомляем всех остальных участников в комнате
+                notifyParticipants(currentRoom, participantId, {
+                  type: 'participant-killed',
+                  data: {
+                    participantId,
+                    killed: killedData.killed
+                  }
+                });
+              }
+            }
             break;
             
           default:

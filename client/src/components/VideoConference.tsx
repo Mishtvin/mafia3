@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import Header from "./Header";
+import Sidebar from "./Sidebar";
 import NotificationArea from "./NotificationArea";
 import VideoGrid from "./VideoGrid";
 import { useToast } from "@/hooks/use-toast";
 import * as MediasoupClient from "../lib/mediasoupClient";
 import { DeviceInfo } from "@shared/types";
+import { RemoteVideo } from "./RemoteVideo2";
+import { RemoteVideoIframe } from "./RemoteVideoIframe2";
 
 const VideoConference = () => {
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
@@ -15,6 +17,12 @@ const VideoConference = () => {
   const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(new Map());
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [connectionNotification, setConnectionNotification] = useState<string | null>(null);
+  const [useIframeMethod, setUseIframeMethod] = useState<boolean>(false);
+  const [maxVideosPerRow, setMaxVideosPerRow] = useState<number>(4);
+  const [nicknames, setNicknames] = useState<Record<string, string>>({});
+  const [localNickname, setLocalNickname] = useState<string>("You (Local)");
+  const [isKilled, setIsKilled] = useState<boolean>(false);
+  const [killedParticipants, setKilledParticipants] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -71,6 +79,29 @@ const VideoConference = () => {
           title: "Error",
           description: error,
           variant: "destructive",
+        });
+      },
+      onNicknameChange: (participantId, nickname) => {
+        console.log(`Participant ${participantId} changed nickname to: ${nickname}`);
+        
+        // Обновить имя в списке имен глобальных имен (которые установлены другими участниками)
+        handleNicknameChange(participantId, nickname);
+        
+        // Убрали уведомления об изменении имени по требованию
+      },
+      onParticipantKilled: (participantId, isKilled) => {
+        console.log(`Participant ${participantId} killed status changed to: ${isKilled}`);
+        
+        // Оновлюємо статус вбивства в списку учасників
+        setKilledParticipants(prev => ({
+          ...prev,
+          [participantId]: isKilled
+        }));
+        
+        // Показуємо сповіщення
+        toast({
+          title: isKilled ? "Учасника вбито" : "Учасник знову живий",
+          description: `Учасник ${nicknames[participantId] || participantId} ${isKilled ? 'помічений як вбитий' : 'знову живий'}`,
         });
       }
     });
@@ -246,102 +277,146 @@ const VideoConference = () => {
     await startCamera();
   };
 
+  // Получаем список ID участников
+  const remoteParticipantsList = Array.from(remoteStreams.keys());
+
+  // Функция для обновления глобального никнейма (используется при получении уведомлений от сервера)
+  const handleNicknameChange = (id: string, newName: string) => {
+    setNicknames(prev => ({
+      ...prev,
+      [id]: newName
+    }));
+  };
+  
+  // Функция для обновления локальных имен участников (только для меня)
+  const handleLocalParticipantNicknameChange = (id: string, newName: string) => {
+    console.log(`Changing local nickname for participant ${id} to ${newName}`);
+    setNicknames(prev => ({
+      ...prev,
+      [id]: newName
+    }));
+  };
+
+  // Функція для оновлення локального нікнейму
+  const handleLocalNicknameChange = (newName: string) => {
+    setLocalNickname(newName);
+    
+    // Відображаємо повідомлення про зміну імені
+    toast({
+      title: "Ім'я змінено",
+      description: `Ваше ім'я в конференції тепер: ${newName}`,
+    });
+    
+    console.log(`Локальне ім'я змінено на: ${newName}`);
+    
+    // Відправляємо сповіщення іншим учасникам через WebSocket
+    if (isConnected) {
+      MediasoupClient.changeNickname(newName);
+    }
+  };
+
+  // Функція для оновлення режиму відображення
+  const handleIframeModeChange = (value: boolean) => {
+    setUseIframeMethod(value);
+  };
+
+  // Функція для оновлення максимальної кількості відео в ряду
+  const handleMaxVideosChange = (value: number) => {
+    setMaxVideosPerRow(value);
+  };
+
+  // Функція для оновлення з'єднання
+  const handleRefreshConnection = async () => {
+    toast({
+      title: "Перезавантаження з'єднання",
+      description: "Оновлення усіх відеопотоків...",
+    });
+    
+    // Restore connections after a brief delay
+    setTimeout(async () => {
+      await stopCamera();
+      setTimeout(async () => {
+        await startCamera();
+      }, 500);
+    }, 500);
+  };
+
+  // Функція для позначення себе вбитим
+  const handleKilledToggle = () => {
+    const newKilledStatus = !isKilled;
+    setIsKilled(newKilledStatus);
+    
+    // Відправляємо статус через WebSocket
+    if (isConnected) {
+      MediasoupClient.toggleKilled(newKilledStatus);
+    }
+    
+    // Відображаємо повідомлення
+    toast({
+      title: newKilledStatus ? "Вас вбито" : "Ви знову живі",
+      description: newKilledStatus 
+        ? "Інші учасники не бачать ваше відео" 
+        : "Ваше відео знову видиме для інших",
+    });
+  };
+
   return (
     <>
-      <Header 
+      {/* Бічна панель з налаштуваннями */}
+      <Sidebar 
         isCameraEnabled={isCameraEnabled}
         isConnected={isConnected}
         selectedDeviceId={selectedDeviceId}
         cameraDevices={cameraDevices}
+        remoteParticipants={remoteParticipantsList}
+        isKilled={isKilled}
         onCameraToggle={toggleCamera}
         onCameraChange={handleCameraChange}
+        onRefreshConnection={handleRefreshConnection}
+        onNicknameChange={handleNicknameChange}
+        onKilledToggle={handleKilledToggle}
       />
 
+      {/* Повідомлення про помилки */}
       <NotificationArea 
         permissionError={permissionError}
         connectionNotification={connectionNotification}
       />
 
-      <main className="flex-grow container mx-auto p-4 md:p-6 flex flex-col">
-        {/* Status bar for connected users */}
-        {isCameraEnabled && isConnected && (
-          <div className="mb-4 flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-between px-4 py-3 bg-slate-800 rounded-md shadow">
-              <div className="flex items-center space-x-2">
-                <div className="relative">
-                  <div className={`w-3 h-3 rounded-full ${remoteStreams.size > 0 ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-                  <div className={`absolute top-0 left-0 w-3 h-3 rounded-full ${remoteStreams.size > 0 ? 'bg-green-500' : 'bg-amber-500'} animate-ping opacity-50`}></div>
-                </div>
-                <span className="text-sm font-medium text-slate-100">
-                  {remoteStreams.size > 0 
-                    ? `Соединение активно: ${remoteStreams.size} ${remoteStreams.size === 1 ? 'участник' : 'участников'} в сети` 
-                    : 'Соединение установлено, ожидание участников...'
-                  }
-                </span>
-              </div>
-              
-              {/* Stream status summary */}
-              {remoteStreams.size > 0 && (
-                <div className="text-xs flex space-x-2 mt-2 sm:mt-0">
-                  <span className="px-2 py-1 bg-emerald-500 bg-opacity-20 text-emerald-400 rounded-md">
-                    {remoteStreams.size} активных подключений
-                  </span>
-                  <button 
-                    onClick={() => {
-                      // Force reload all video connections
-                      toast({
-                        title: "Перезагрузка соединений",
-                        description: "Обновление всех видеопотоков...",
-                      });
-                      
-                      // Restore connections after a brief delay
-                      setTimeout(async () => {
-                        await stopCamera();
-                        setTimeout(async () => {
-                          await startCamera();
-                        }, 500);
-                      }, 500);
-                    }}
-                    className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md flex items-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-                    </svg>
-                    Обновить все
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        
+      <main className="flex-grow p-4 md:p-6 flex flex-col">
         {!isCameraEnabled ? (
           <div className="flex-grow flex flex-col items-center justify-center text-center p-8">
-            <div className="rounded-full bg-slate-100 p-6 mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+            <div className="rounded-full bg-primary/10 p-6 mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-primary" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
                 <path d="M14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
               </svg>
             </div>
-            <h2 className="text-xl font-medium text-slate-900 mb-2">Start your video conference</h2>
-            <p className="text-slate-600 max-w-md mb-6">Click the "Enable Camera" button above to join the conference and let others see you.</p>
             <button 
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-lg"
               onClick={handleStartConference}
             >
-              Start Conference
+              Приєднатися
             </button>
           </div>
         ) : (
           <VideoGrid 
             localStream={localStream} 
-            remoteStreams={remoteStreams} 
+            remoteStreams={remoteStreams}
+            useIframeMethod={useIframeMethod}
+            maxVideosPerRow={maxVideosPerRow}
+            nicknames={nicknames}
+            localNickname={localNickname}
+            onLocalNicknameChange={handleLocalNicknameChange}
+            onRemoteNicknameChange={handleLocalParticipantNicknameChange}
+            isKilled={isKilled}
+            killedParticipants={killedParticipants}
           />
         )}
       </main>
 
-      <footer className="py-4 text-center text-sm text-slate-500">
-        <p>WebRTC Video Conference powered by mediasoup</p>
+      <footer className="py-2">
+        {/* Footer content removed as per user request */}
       </footer>
     </>
   );

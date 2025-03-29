@@ -8,7 +8,7 @@ const app = express();
 
 // Разрешение Cross-Origin Resource Sharing (CORS) с расширенными настройками
 app.use(cors({
-  origin: 'https://mish.leb1gamafia.com', // Разрешаем запросы с любого источника
+  origin: '*', // Разрешаем запросы с любого источника
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true, // Разрешаем передачу куки и заголовков аутентификации

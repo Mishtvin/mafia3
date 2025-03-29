@@ -18,7 +18,7 @@ const Header = ({
   onCameraChange,
 }: HeaderProps) => {
   return (
-    <header className="bg-white shadow-sm py-4">
+    <header className="bg-[#1a202c] shadow-sm py-4">
       <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-xl font-semibold text-primary">Video Conference</h1>
         
@@ -29,7 +29,7 @@ const Header = ({
               id="cameraSelect"
               value={selectedDeviceId}
               onChange={(e) => onCameraChange(e.target.value)}
-              className="appearance-none bg-white border border-slate-300 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="appearance-none bg-[#131a27] border border-[#2c3748] text-white rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             >
               {cameraDevices.length === 0 && (
                 <option value="">No cameras found</option>
@@ -64,9 +64,9 @@ const Header = ({
           </button>
           
           {/* Connection Status */}
-          <div className="connection-status flex items-center gap-2 text-sm text-slate-600">
+          <div className="connection-status flex items-center gap-2 text-sm text-gray-300">
             <span 
-              className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-success' : 'bg-slate-300'}`}
+              className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-success' : 'bg-gray-600'}`}
               title={isConnected ? 'Connected' : 'Not connected'}
             />
             <span>{isConnected ? 'Connected' : 'Not Connected'}</span>

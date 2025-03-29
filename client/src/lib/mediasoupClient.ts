@@ -9,6 +9,8 @@ import {
   ProducerClosedMessage,
   ConnectTransportMessage,
   ProduceMessage,
+  NicknameChangeMessage,
+  ParticipantKilledMessage,
   ServerInitResponse,
   ProduceResponse,
   ConsumeResponse
@@ -20,6 +22,8 @@ interface MediasoupClientConfig {
   onRemoteStream: (participantId: string, stream: MediaStream) => void;
   onRemoteStreamClosed: (participantId: string) => void;
   onError: (error: string) => void;
+  onNicknameChange?: (participantId: string, nickname: string) => void;
+  onParticipantKilled?: (participantId: string, isKilled: boolean) => void;
 }
 
 // mediasoup and WebSocket state
@@ -32,6 +36,19 @@ let consumers: Map<string, any> = new Map();
 let config: MediasoupClientConfig | null = null;
 let localStream: MediaStream | null = null;
 let roomId: string = 'default-room';
+
+// Переменные для автоматического переподключения и контроля состояния
+let isConnecting = false;
+let reconnectTimeout: number | null = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_INTERVAL = 3000; // 3 секунды
+const PING_INTERVAL = 25000; // 25 секунд (меньше, чем интервал сервера)
+let pingInterval: number | null = null;
+
+// Храним предыдущее имя для отслеживания изменений
+let currentNickname = "Участник";
+let isKilled = false;
 
 export function init(clientConfig: MediasoupClientConfig): void {
   config = clientConfig;
@@ -55,6 +72,29 @@ export async function connect(stream: MediaStream): Promise<void> {
     socket = new WebSocket(wsUrl);
 
     socket.onopen = async () => {
+      console.log('WebSocket connection established');
+      
+      // Сбросить счетчики переподключения
+      isConnecting = false;
+      reconnectAttempts = 0;
+      
+      // Настроить регулярную отправку пингов для поддержания соединения
+      if (pingInterval) {
+        clearInterval(pingInterval);
+      }
+      
+      pingInterval = window.setInterval(() => {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          // Отправка собственного пинга (не через API WebSocket)
+          console.log('Sending ping to keep connection alive');
+          try {
+            socket.send(JSON.stringify({ type: 'ping' }));
+          } catch (e) {
+            console.warn('Failed to send ping:', e);
+          }
+        }
+      }, PING_INTERVAL);
+      
       // Create mediasoup device
       device = new Device();
       
@@ -108,6 +148,25 @@ export async function connect(stream: MediaStream): Promise<void> {
               config?.onRemoteStreamClosed(participantId);
             }
             break;
+          case 'nickname-change':
+            // Обработка изменения имени участника
+            console.log('Nickname changed:', msgData);
+            if (msgData.isLocalChange) {
+              console.log('This is our own nickname change, skipping external notification');
+            } else {
+              // Уведомляем приложение об изменении имени другого участника
+              if (config?.onNicknameChange) {
+                config.onNicknameChange(msgData.participantId, msgData.nickname);
+              }
+            }
+            break;
+          case 'participant-killed':
+            // Обработка статуса "убит" участника
+            console.log('Participant killed status changed:', msgData);
+            if (msgData.participantId && config?.onParticipantKilled) {
+              config.onParticipantKilled(msgData.participantId, msgData.killed);
+            }
+            break;
           case 'error':
             console.error('Error from server:', message.error || msgData);
             config?.onError(message.error || msgData || 'Unknown error from server');
@@ -129,10 +188,53 @@ export async function connect(stream: MediaStream): Promise<void> {
     };
 
     socket.onclose = () => {
+      console.log('WebSocket connection closed');
+      
+      // Очистка интервала пингов
+      if (pingInterval) {
+        clearInterval(pingInterval);
+        pingInterval = null;
+      }
+      
+      // Уведомить приложение о разрыве соединения
       config?.onDisconnect();
+      
+      // Автоматически переподключиться, если соединение было потеряно
+      if (!isConnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS && localStream) {
+        console.log(`Scheduling reconnect attempt ${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS}...`);
+        
+        isConnecting = true;
+        
+        // Задержка перед повторным подключением
+        reconnectTimeout = window.setTimeout(async () => {
+          reconnectAttempts++;
+          
+          console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+          
+          try {
+            // Переподключение с тем же потоком, но проверяем его наличие
+            if (localStream) {
+              await connect(localStream);
+              console.log('Reconnection successful!');
+            } else {
+              console.error('Cannot reconnect: no local stream available');
+              isConnecting = false;
+            }
+          } catch (err) {
+            console.error('Reconnection failed:', err);
+            isConnecting = false;
+            
+            // Если это была последняя попытка, уведомить пользователя
+            if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+              config?.onError('Failed to reconnect after multiple attempts. Please refresh the page.');
+            }
+          }
+        }, RECONNECT_INTERVAL);
+      }
     };
 
     socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
       config?.onError(`WebSocket error: ${error}`);
     };
   } catch (error: any) {
@@ -142,6 +244,19 @@ export async function connect(stream: MediaStream): Promise<void> {
 }
 
 export async function disconnect(): Promise<void> {
+  // Сбросить состояние соединения и таймеры
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = null;
+  }
+  
+  if (pingInterval) {
+    clearInterval(pingInterval);
+    pingInterval = null;
+  }
+  
+  isConnecting = false;
+  
   // Close producers
   if (videoProducer) {
     videoProducer.close();
@@ -163,20 +278,89 @@ export async function disconnect(): Promise<void> {
 
   // Close WebSocket
   if (socket && socket.readyState === WebSocket.OPEN) {
-    const leaveMessage: LeaveMessage = {
-      type: MessageType.LEAVE
-    };
-    sendMessage(leaveMessage);
-    socket.close();
+    // Отправляем сообщение о выходе из комнаты
+    try {
+      const leaveMessage: LeaveMessage = {
+        type: MessageType.LEAVE
+      };
+      console.log('Sending leave message before disconnect');
+      sendMessage(leaveMessage);
+    } catch (err) {
+      console.warn('Failed to send leave message:', err);
+    }
+    
+    // Закрываем соединение
+    try {
+      socket.close(1000, 'Disconnect requested by client');
+    } catch (err) {
+      console.warn('Error closing WebSocket:', err);
+    }
   }
   
   socket = null;
   device = null;
+  
+  console.log('Disconnected from server');
 }
 
 export function close(): void {
   disconnect();
   config = null;
+}
+
+// Функція для позначення користувача вбитим
+export function toggleKilled(killed: boolean): void {
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    console.error('WebSocket not connected, cannot send killed status');
+    return;
+  }
+  
+  isKilled = killed;
+  
+  // В нашей реализации мы НЕ отключаем локальный трек
+  // Так как необходимо чтобы пользователь видел сам себя даже когда отмечен как убитый
+  // Вместо этого мы только отправляем сообщение на сервер
+  // Сервер продолжит отправлять поток, но другие клиенты покажут overlay "Вбито" на видео
+  
+  // Для отладки всё же логируем факт изменения статуса
+  if (localStream) {
+    // Получаем видеотреки
+    const videoTracks = localStream.getVideoTracks();
+    console.log(`Video track status remains enabled for user. Status change sent to server: ${killed ? 'killed' : 'alive'}`);
+  }
+  
+  // Створюємо повідомлення про вбивство для відправки
+  const killedMessage: ParticipantKilledMessage = {
+    type: MessageType.PARTICIPANT_KILLED,
+    killed: killed
+  };
+  
+  // Відправляємо повідомлення серверу
+  sendMessage(killedMessage);
+  
+  console.log(`User ${killed ? 'killed' : 'revived'} status sent to server`);
+}
+
+// Функция для отправки сообщения об изменении имени
+export function changeNickname(nickname: string): void {
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    console.error('WebSocket not connected, cannot send nickname change');
+    return;
+  }
+  
+  // Сохраняем предыдущее имя
+  const previousName = currentNickname;
+  currentNickname = nickname;
+  
+  // Создаем сообщение для отправки серверу
+  const nicknameChangeMessage: NicknameChangeMessage = {
+    type: MessageType.NICKNAME_CHANGE,
+    nickname: nickname,
+    previousName: previousName
+  };
+  
+  // Отправляем сообщение серверу
+  sendMessage(nicknameChangeMessage);
 }
 
 // Helper to send WebSocket messages

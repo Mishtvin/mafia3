@@ -1,0 +1,359 @@
+Temporary camera access granted to enumerate devices
+index-CKJI533A.js:68 Found video devices: Array(5)
+index-CKJI533A.js:68 Setting default camera to: 7c0a0bc9705a4808533eb513b7ea03a3accd608695f31f289ae681edecf71882
+index-CKJI533A.js:65 VideoGrid: Remote participants updated. Total: 0
+index-CKJI533A.js:65 VideoGrid: Local stream attached to video element
+index-CKJI533A.js:68 Sent message to server: join
+index-CKJI533A.js:68 Received message from server: welcome Object
+index-CKJI533A.js:68 Received welcome message with router capabilities
+index-CKJI533A.js:68 Sending join message with RTP capabilities
+index-CKJI533A.js:68 Sent message to server: join
+index-CKJI533A.js:68 Sent message to server: connect-transport
+index-CKJI533A.js:68 Sent message to server: produce
+index-CKJI533A.js:68 Received message from server: produce-response Object
+index-CKJI533A.js:68 Received produce response for ID: 66b1f3c2-343b-4e6c-a2bf-6c05e90c524d
+index-CKJI533A.js:68 Received message from server: new-producer Object
+index-CKJI533A.js:68 Received new producer notification: Object
+index-CKJI533A.js:68 New producer notification received. Producer ID: cfd88032-ad0d-4d04-a207-71cf45788b7b, Participant ID: user-wxyi97nma
+index-CKJI533A.js:68 Requesting to consume producer cfd88032-ad0d-4d04-a207-71cf45788b7b from participant user-wxyi97nma
+index-CKJI533A.js:68 Sent message to server: request-consume
+index-CKJI533A.js:68 Received message from server: consume-response Object
+index-CKJI533A.js:68 Received consume response: 4ed2b097-1d77-4b4c-a186-b9f6e2579157
+index-CKJI533A.js:68 Processing consume response for producer cfd88032-ad0d-4d04-a207-71cf45788b7b from participant user-wxyi97nma
+index-CKJI533A.js:68 Creating new receive transport for producer cfd88032-ad0d-4d04-a207-71cf45788b7b
+index-CKJI533A.js:68 Consuming track with ID 4ed2b097-1d77-4b4c-a186-b9f6e2579157, producer cfd88032-ad0d-4d04-a207-71cf45788b7b, kind video
+index-CKJI533A.js:68 Connecting receive transport 7d90cc7d-5151-4585-b724-8d3b6d9ad7d3 for producer cfd88032-ad0d-4d04-a207-71cf45788b7b
+index-CKJI533A.js:68 Sent message to server: connect-transport
+index-CKJI533A.js:68 Consumer created with ID 4ed2b097-1d77-4b4c-a186-b9f6e2579157 for producer cfd88032-ad0d-4d04-a207-71cf45788b7b
+index-CKJI533A.js:68 Consumer track details - enabled: true, readyState: live, kind: video
+index-CKJI533A.js:68 Track settings for user-wxyi97nma: Object
+index-CKJI533A.js:68 Applied aggressive security bypass techniques for user-wxyi97nma. Video may still appear directly in <video> elements despite restrictions.
+index-CKJI533A.js:68 Created MediaStream from consumer track, kind: video, active: true
+index-CKJI533A.js:68 Stream track 0: kind=video, enabled=true, readyState=live
+index-CKJI533A.js:68 Notifying application about new remote stream from participant user-wxyi97nma
+index-CKJI533A.js:68 Received remote stream from participant user-wxyi97nma
+index-CKJI533A.js:68 Added stream from user-wxyi97nma, total streams: 1
+index-CKJI533A.js:68 Consumer for user-wxyi97nma resumed
+index-CKJI533A.js:65 VideoGrid: Remote participants updated. Total: 1
+index-CKJI533A.js:65 RemoteVideo: Stream for user-wxyi97nma - active: true, tracks: 1
+index-CKJI533A.js:65 RemoteVideo: Track 0 for user-wxyi97nma - kind: video, enabled: true, readyState: live
+index-CKJI533A.js:65 RemoteVideo: Testing canvas capture for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Setting up video for participant user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Applying advanced compatibility settings for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Attaching stream for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Attempting to play video for user-wxyi97nma with enhanced techniques
+index-CKJI533A.js:65 RemoteVideo: Playback waiting for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Metadata loaded for user-wxyi97nma - 480x640
+index-CKJI533A.js:65 RemoteVideo: Data loaded for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: onCanPlay fired for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Playback started for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Play attempts completed for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Stream for user-wxyi97nma - active: true, tracks: 1
+index-CKJI533A.js:65 RemoteVideo: Track 0 for user-wxyi97nma - kind: video, enabled: true, readyState: live
+index-CKJI533A.js:65 RemoteVideo: Testing canvas capture for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 0.23
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 0.512
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 0.77
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 1.065
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 1.322
+index-CKJI533A.js:65 RemoteVideo: Canvas test for user-wxyi97nma - has data: true
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 1.589
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 1.832
+index-CKJI533A.js:65 RemoteVideo: Canvas test for user-wxyi97nma - has data: true
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 2.11
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 2.371
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 2.639
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 2.905
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 3.004
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 3.168
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 3.441
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 3.708
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 3.975
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 4.211
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 4.478
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 4.744
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 5.047
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 5.313
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 5.58
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 5.847
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 5.978
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 6.079
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 6.346
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 6.612
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 6.877
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 7.146
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 7.413
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 7.679
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 7.948
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 8.228
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 8.461
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 8.726
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 8.993
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 8.993
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 9.261
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 9.526
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 9.794
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 10.06
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 10.327
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 10.594
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 10.889
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 11.156
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 11.423
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 11.689
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 11.956
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 11.99
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 12.222
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 12.489
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 12.756
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 12.989
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 13.256
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 13.556
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 13.818
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 14.085
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 14.351
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 14.618
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 14.884
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 15.118
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 15.151
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 15.418
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 15.652
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 15.952
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 16.186
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 16.485
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 16.752
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 17.019
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 17.286
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 17.519
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 17.819
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 18.086
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 18.086
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 18.353
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 18.585
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 18.854
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 19.121
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 19.388
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 19.653
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 19.92
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 20.188
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 20.454
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 20.72
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 20.987
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 21.088
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 21.254
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 21.521
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 21.788
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 22.055
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 22.321
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 22.588
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 22.855
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 23.122
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 23.356
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 23.654
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 23.923
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 24.091
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 24.19
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 24.424
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 24.691
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 24.99
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 25.257
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 25.524
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 25.791
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 26.025
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 26.291
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 26.559
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 26.825
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 27.092
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 27.092
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 27.359
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 27.626
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 27.892
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 28.159
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 28.427
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 28.694
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 28.959
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 29.226
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 29.493
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 29.726
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 30.027
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 30.093
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 30.26
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 30.56
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 30.827
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 31.094
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 31.327
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 31.628
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 31.895
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 32.129
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 32.428
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 32.661
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 32.929
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 32.995
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 33.195
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 33.463
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 33.73
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 33.996
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 34.229
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 34.5
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 34.798
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 35.065
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 35.333
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 35.599
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 35.865
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 36.099
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 36.132
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 36.4
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 36.667
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 36.933
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 37.2
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 37.467
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 37.736
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 38.003
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 38.236
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 38.536
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 38.769
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 39.068
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 39.1
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 39.3
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 39.566
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 39.833
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 40.134
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 40.401
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 40.634
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 40.902
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 41.168
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 41.434
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 41.702
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 41.969
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 42.103
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 42.235
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 42.503
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 42.77
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 43.037
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 43.304
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 43.571
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 43.837
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 44.104
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 44.371
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 44.638
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 44.905
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 45.105
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 45.139
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 45.439
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 45.671
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 45.972
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 46.206
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 46.507
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 46.774
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 47.007
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 47.274
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 47.573
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 47.84
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 48.073
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 48.073
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 48.34
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 48.607
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 48.874
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 49.141
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 49.408
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 49.675
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 49.942
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 50.175
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 50.442
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 50.709
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 50.977
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 51.01
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 51.245
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 51.511
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 51.777
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 52.044
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 52.312
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 52.611
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 52.845
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 53.112
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 53.38
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 53.645
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 53.914
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 53.98
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 54.181
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 54.448
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 54.714
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 54.982
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 55.246
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 55.514
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 55.78
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 56.047
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 56.314
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 56.582
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 56.848
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 57.082
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 57.116
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 57.382
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 57.65
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 57.918
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 58.184
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 58.452
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 58.685
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 58.985
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 59.252
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 59.485
+index-CKJI533A.js:65 RemoteVideo: Video for user-wxyi97nma is actually playing, currentTime: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Track 0 muted for user-wxyi97nma
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640
+index-CKJI533A.js:65 RemoteVideo: Video metadata check for user-wxyi97nma - dimensions: 480x640, time: 59.552
+index-CKJI533A.js:65 RemoteVideo: Video content confirmed for user-wxyi97nma with dimensions 480x640

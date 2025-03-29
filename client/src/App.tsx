@@ -7,7 +7,7 @@ import VideoConference from "./components/VideoConference";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
+      <div className="flex flex-col min-h-screen bg-[#0e1117] text-white">
         <VideoConference />
         <Toaster />
       </div>

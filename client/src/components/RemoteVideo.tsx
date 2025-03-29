@@ -346,7 +346,7 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
   };
   
   return (
-    <div className="bg-slate-800 rounded-lg overflow-hidden relative aspect-video shadow-md transition-all duration-300">
+    <div className="bg-[#1a202c] rounded-lg overflow-hidden relative aspect-video shadow-md transition-all duration-300">
       <video
         ref={videoRef}
         className={`w-full h-full bg-black ${isVideoReady ? 'object-contain' : 'object-cover'}`}
@@ -482,19 +482,19 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       {/* Placeholder for empty video */}
       {!noStream && !isVideoReady && Date.now() - startTimeRef.current > 5000 && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
-          <div className="text-center text-white bg-slate-800 bg-opacity-80 p-4 rounded-lg max-w-[80%]">
+          <div className="text-center text-white bg-[#1c2333] bg-opacity-80 p-4 rounded-lg max-w-[80%]">
             <div className="mb-4">
-              <div className="w-20 h-20 mx-auto rounded-full bg-slate-700 flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto rounded-full bg-[#131a27] flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
               </div>
             </div>
             <p className="text-sm font-medium text-green-300">Connection successful ✓</p>
-            <p className="text-sm text-slate-300 mt-2">Video display restricted by browser security</p>
-            <p className="text-xs text-slate-400 mt-1">This is normal when using WebRTC in certain environments</p>
-            <div className="mt-3 border-t border-slate-700 pt-3">
-              <p className="text-xs text-slate-400">Note: Stream would be visible if accessed outside iframe sandbox</p>
+            <p className="text-sm text-gray-300 mt-2">Video display restricted by browser security</p>
+            <p className="text-xs text-gray-400 mt-1">This is normal when using WebRTC in certain environments</p>
+            <div className="mt-3 border-t border-[#2c3748] pt-3">
+              <p className="text-xs text-gray-400">Note: Stream would be visible if accessed outside iframe sandbox</p>
             </div>
           </div>
         </div>

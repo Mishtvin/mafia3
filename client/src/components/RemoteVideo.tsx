@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 interface RemoteVideoProps {
   participantId: string;
   stream: MediaStream;
+  isLocal?: boolean;
 }
 
-export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
+export const RemoteVideo = ({ participantId, stream, isLocal = false }: RemoteVideoProps) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -33,12 +34,17 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
     // Подключаем видеопоток
     video.srcObject = stream;
 
+    // Проверка видимости элемента
+    const rect = video.getBoundingClientRect();
+    console.log(`🧪 Video size for ${participantId}:`, rect.width, rect.height);
+
     // Функция для воспроизведения видео
     const tryPlay = () => {
       video
         .play()
         .then(() => {
           console.log(`✅ Video play() successful for ${participantId}`);
+          console.log(`📺 Paused after play? ${participantId}:`, video.paused);
           setIsVideoReady(true);
         })
         .catch((err) => {
@@ -46,20 +52,18 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         });
     };
 
-    // Обработчик загрузки метаданных
-    const metadataHandler = () => {
-      console.log(`🎬 onloadedmetadata for ${participantId}`);
-      video.load();
+    // Обработчик загрузки данных
+    const dataLoadedHandler = () => {
+      console.log(`🎬 onloadeddata for ${participantId}`);
       tryPlay();
     };
 
-    video.onloadedmetadata = metadataHandler;
+    video.onloadeddata = dataLoadedHandler;
 
     // В любом случае пробуем через 500мс
     const forcePlayTimeout = setTimeout(() => {
       if (video.readyState < 2) {
         console.log(`⌛ Forcing video play for ${participantId}`);
-        video.load();
         tryPlay();
       }
     }, 500);
@@ -85,7 +89,7 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
 
     return () => {
       clearTimeout(forcePlayTimeout);
-      video.onloadedmetadata = null;
+      video.onloadeddata = null;
       video.srcObject = null;
       try {
         document.body.removeChild(helperVideo);
@@ -110,7 +114,7 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         ref={videoRef}
         autoPlay
         playsInline
-        muted
+        muted={isLocal}
         style={{
           width: '100%',
           height: '100%',

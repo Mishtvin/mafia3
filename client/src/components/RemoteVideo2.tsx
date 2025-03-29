@@ -27,7 +27,42 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
   useEffect(() => {
     setPlayAttempts(0);
     setVideoError(null);
-    setHasVideo(false);
+  }, [stream]);
+
+  // Обход content isolation — добавление helperVideo
+  useEffect(() => {
+    if (!stream) return;
+
+    const helperVideo = document.createElement("video");
+    helperVideo.srcObject = stream;
+    helperVideo.autoplay = true;
+    helperVideo.muted = true;
+    helperVideo.playsInline = true;
+
+    Object.assign(helperVideo.style, {
+      position: "absolute",
+      width: "1px",
+      height: "1px",
+      top: "0",
+      left: "0",
+      opacity: "0.01",
+      zIndex: "-9999",
+      pointerEvents: "none",
+    });
+
+    document.body.appendChild(helperVideo);
+
+    helperVideo.play()
+      .then(() => {
+        console.log(`✅ Helper video playing for ${participantId}`);
+      })
+      .catch((err) => {
+        console.warn(`⚠️ Helper video failed for ${participantId}:`, err);
+      });
+
+    return () => {
+      document.body.removeChild(helperVideo);
+    };
   }, [stream, participantId]);
 
   // Эффект для подключения потока к видеоэлементу

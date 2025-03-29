@@ -615,31 +615,16 @@ async function handleNewProducer(data: { producerId: string, participantId: stri
 // Handle consume response
 async function handleConsumeResponse(data: ConsumeResponse & { transportOptions: any, participantId: string }): Promise<void> {
   console.log(`Processing consume response for producer ${data.producerId} from participant ${data.participantId}`);
-  
+
   try {
-    // Проверяем, есть ли уже транспорт для этого участника
     let recvTransport = participantRecvTransports.get(data.participantId);
-    
-    // Если нет, создаем новый транспорт для этого участника
+
     if (!recvTransport) {
       console.log(`Creating new receive transport for participant ${data.participantId}`);
-      recvTransport = device!.createRecvTransport({
-        id: data.transportOptions.id,
-        iceParameters: data.transportOptions.iceParameters,
-        iceCandidates: data.transportOptions.iceCandidates,
-        dtlsParameters: data.transportOptions.dtlsParameters,
-        // Явно указываем, что используем Unified Plan
-        additionalSettings: {
-          rtcConfiguration: {
-            sdpSemantics: 'unified-plan'
-          }
-        }
-      });
-      
-      recvTransport.on('connect', ({ dtlsParameters }: any, callback: any, errback: any) => {
+      recvTransport = device!.createRecvTransport(data.transportOptions);
+
+      recvTransport.on('connect', ({ dtlsParameters }, callback, errback) => {
         try {
-          console.log(`Connecting receive transport ${recvTransport.id} for participant ${data.participantId}`);
-          // Signal transport connection to server
           const connectMessage: ConnectTransportMessage = {
             type: MessageType.CONNECT_TRANSPORT,
             transportId: recvTransport.id,
@@ -648,135 +633,77 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
           sendMessage(connectMessage);
           callback();
         } catch (error) {
-          console.error(`Error connecting receive transport: ${error}`);
           errback(error);
         }
       });
-      
-      // Сохраняем транспорт для данного участника
+
       participantRecvTransports.set(data.participantId, recvTransport);
     }
-    
-    // Consume the track
-    console.log(`Consuming track with ID ${data.id}, producer ${data.producerId}, kind ${data.kind}`);
-    
+
+    // --- 🔥 Consume and immediately resume
     const consumer = await recvTransport.consume({
       id: data.id,
       producerId: data.producerId,
       kind: data.kind,
       rtpParameters: data.rtpParameters
     });
-    
-    console.log(`Consumer created with ID ${consumer.id} for producer ${data.producerId}`);
-    consumers.set(data.producerId, consumer);
-    
-    // Ensure the track is enabled
-    if (!consumer.track.enabled) {
-      console.log(`Enabling disabled track from ${data.participantId}`);
-      consumer.track.enabled = true;
-    }
-    
-    // Debug the track
-    console.log(`Consumer track details - enabled: ${consumer.track.enabled}, readyState: ${consumer.track.readyState}, kind: ${consumer.track.kind}`);
-    
-    // Apply needed transformations to the track (e.g., for Safari)
-    try {
-      if (consumer.track.getSettings) {
-        const settings = consumer.track.getSettings();
-        console.log(`Track settings for ${data.participantId}:`, settings);
-        
-        // Проверка наличия ограничений безопасности и применение более агрессивных обходных путей
-        if (!settings.width && !settings.height && !settings.frameRate) {
-          console.warn(`Content isolation detected for track from ${data.participantId}`);
-          
-          // Force track compatibility - максимально возможное включение трека
-          consumer.track.enabled = true;
-          
-          // Simpler approach: создаем вспомогательный видеоэлемент для преодоления ограничений
-          try {
-            // Создаем вспомогательный видеоэлемент
-            const videoEl = document.createElement('video');
-            videoEl.autoplay = true;
-            videoEl.muted = true;
-            videoEl.playsInline = true;
-            videoEl.style.width = '2px';
-            videoEl.style.height = '2px';
-            videoEl.style.position = 'fixed';
-            videoEl.style.opacity = '0.01';
-            videoEl.style.pointerEvents = 'none';
-            
-            // Создаем новый поток для этого видео
-            const tempStream = new MediaStream([consumer.track]);
-            videoEl.srcObject = tempStream;
-            
-            // Добавляем элемент в DOM ненадолго
-            document.body.appendChild(videoEl);
-            
-            // Запускаем видео
-            videoEl.play()
-              .then(() => {
-                console.log(`✅ Helper video playing for ${data.participantId}`);
-                
-                // Через некоторое время удаляем элемент, но сохраняем трек активным
-                setTimeout(() => {
-                  document.body.removeChild(videoEl);
-                }, 1000);
-              })
-              .catch(err => {
-                console.warn(`Helper video failed for ${data.participantId}:`, err);
-                document.body.removeChild(videoEl);
-              });
-          } catch (e) {
-            console.warn(`Helper video technique failed for ${data.participantId}:`, e);
-          }
-        }
-      }
-    } catch (err) {
-      console.warn(`Could not get track settings for ${data.participantId}:`, err);
-    }
-    
-    // Create a MediaStream with the consumer's track
-    const stream = new MediaStream([consumer.track]);
-    console.log(`Created MediaStream from consumer track, kind: ${consumer.track.kind}, active: ${stream.active}`);
-    
-    // Debug stream tracks and attempt to fix muted issues
-    stream.getTracks().forEach((track, index) => {
-      console.log(`Stream track ${index}: kind=${track.kind}, enabled=${track.enabled}, readyState=${track.readyState}, muted=${track.muted}`);
-      
-      if (track.muted) {
-        console.log(`⚠️ Track ${index} from ${data.participantId} is muted! Attempting to fix...`);
-        
-        // Try force-enabling the track several times
-        track.enabled = true;
-        
-        // Check if the track is still muted after enabling
-        setTimeout(() => {
-          console.log(`🔄 Re-checking track ${index} from ${data.participantId} - muted: ${track.muted}, enabled: ${track.enabled}`);
-        }, 500);
-      }
-      
-      // Add event listeners for track events
-      track.onended = () => console.log(`Track ${index} from ${data.participantId} ended`);
-      track.onmute = () => {
-        console.log(`Track ${index} from ${data.participantId} muted`);
-        track.enabled = true; // Try to force-enable when it gets muted
-      };
-      track.onunmute = () => console.log(`Track ${index} from ${data.participantId} unmuted`);
-    });
-    
-    // Resume the consumer to start receiving media BEFORE notifying application
+
     await consumer.resume();
-    console.log(`Consumer for ${data.participantId} resumed`);
-    
-    // Notify application about new remote stream
-    console.log(`Notifying application about new remote stream from participant ${data.participantId}`);
+    console.log(`✅ Consumer for ${data.participantId} resumed`);
+
+    consumers.set(data.producerId, consumer);
+
+    // --- 🎥 Setup MediaStream and track handlers
+    const stream = new MediaStream([consumer.track]);
+    consumer.track.enabled = true;
+
+    // 🔁 Debug and handle track states
+    consumer.track.onmute = () => {
+      console.log(`🔇 Track from ${data.participantId} muted`);
+      consumer.track.enabled = true;
+    };
+    consumer.track.onunmute = () => {
+      console.log(`🔊 Track from ${data.participantId} unmuted`);
+    };
+    consumer.track.onended = () => {
+      console.log(`⛔️ Track from ${data.participantId} ended`);
+    };
+
+    console.log(`Track state: enabled=${consumer.track.enabled}, readyState=${consumer.track.readyState}, muted=${consumer.track.muted}`);
+
+    // --- 🩹 Safari / autoplay workaround via hidden video
+    const helperVideo = document.createElement('video');
+    helperVideo.srcObject = stream;
+    helperVideo.autoplay = true;
+    helperVideo.muted = true;
+    helperVideo.playsInline = true;
+    helperVideo.style.width = '1px';
+    helperVideo.style.height = '1px';
+    helperVideo.style.opacity = '0';
+    helperVideo.style.position = 'absolute';
+    helperVideo.style.pointerEvents = 'none';
+
+    document.body.appendChild(helperVideo);
+    helperVideo.play()
+      .then(() => {
+        console.log(`✅ Helper video playing for ${data.participantId}`);
+        setTimeout(() => helperVideo.remove(), 1500);
+      })
+      .catch(err => {
+        console.warn(`⚠️ Helper video failed:`, err);
+        helperVideo.remove();
+      });
+
+    // --- ✅ Send stream to app
+    console.log(`📦 Notifying application about remote stream from ${data.participantId}`);
     config?.onRemoteStream(data.participantId, stream);
-    
+
   } catch (error: any) {
-    console.error(`Error consuming stream: ${error.message}`, error);
+    console.error(`❌ Error consuming stream: ${error.message}`, error);
     config?.onError(`Error consuming stream: ${error.message}`);
   }
 }
+
 
 // Handle producer closed message
 function handleProducerClosed(data: { producerId: string, participantId: string }): void {

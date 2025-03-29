@@ -516,6 +516,16 @@ async function handleWelcomeMessage(data: ServerInitResponse): Promise<void> {
                       'enabled:', videoTrack.enabled, 
                       'readyState:', videoTrack.readyState);
           
+          // Добавляем более подробное логирование состояния трека
+          console.log("🚀 Local track info before produce:", {
+            label: videoTrack.label,
+            enabled: videoTrack.enabled,
+            muted: videoTrack.muted,
+            readyState: videoTrack.readyState,
+            id: videoTrack.id,
+            settings: videoTrack.getSettings ? videoTrack.getSettings() : 'Not supported'
+          });
+          
           // Убедимся, что трек включен
           videoTrack.enabled = true;
           
@@ -754,13 +764,13 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
       track.onunmute = () => console.log(`Track ${index} from ${data.participantId} unmuted`);
     });
     
+    // Resume the consumer to start receiving media BEFORE notifying application
+    await consumer.resume();
+    console.log(`Consumer for ${data.participantId} resumed`);
+    
     // Notify application about new remote stream
     console.log(`Notifying application about new remote stream from participant ${data.participantId}`);
     config?.onRemoteStream(data.participantId, stream);
-    
-    // Resume the consumer to start receiving media
-    await consumer.resume();
-    console.log(`Consumer for ${data.participantId} resumed`);
     
   } catch (error: any) {
     console.error(`Error consuming stream: ${error.message}`, error);

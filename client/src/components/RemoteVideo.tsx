@@ -16,10 +16,43 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
 
     console.log(`🎥 RemoteVideo setup for ${participantId}`);
 
-    video.srcObject = null; // обнулить
+    video.srcObject = null; 
     video.srcObject = stream;
 
+    const videoTrack = stream.getVideoTracks()[0];
+    if (videoTrack) {
+      console.log(`🔍 Track details for ${participantId}:`, {
+        id: videoTrack.id,
+        enabled: videoTrack.enabled,
+        muted: videoTrack.muted,
+        readyState: videoTrack.readyState
+      });
+    }
+
+    video.onloadedmetadata = () => {
+      console.log(`✅ Metadata for ${participantId}:`, {
+        w: video.videoWidth,
+        h: video.videoHeight,
+      });
+
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        setIsVideoReady(true);
+      }
+
+      const track = stream.getVideoTracks()[0];
+      if (track && track.muted) {
+        console.log(`⚙️ Forcing unmute on track for ${participantId}`);
+        track.enabled = true;
+        
+        video.load();
+        video.play().catch(err => {
+          console.warn(`⚠️ Failed to play video after unmute attempt for ${participantId}:`, err);
+        });
+      }
+    };
+
     const tryPlay = () => {
+      video.load();
       video
         .play()
         .then(() => {
@@ -30,19 +63,6 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
           console.warn(`⚠️ play() failed for ${participantId}`, err);
         });
     };
-
-    const handleLoaded = () => {
-      console.log(`✅ Metadata for ${participantId}:`, {
-        w: video.videoWidth,
-        h: video.videoHeight,
-      });
-
-      if (video.videoWidth > 0 && video.videoHeight > 0) {
-        setIsVideoReady(true);
-      }
-    };
-
-    video.onloadedmetadata = handleLoaded;
 
     setTimeout(tryPlay, 150);
 

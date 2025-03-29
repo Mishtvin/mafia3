@@ -47,11 +47,13 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
     };
 
     // Обработчик загрузки метаданных
-    video.onloadedmetadata = () => {
+    const metadataHandler = () => {
       console.log(`🎬 onloadedmetadata for ${participantId}`);
       video.load();
       tryPlay();
     };
+
+    video.onloadedmetadata = metadataHandler;
 
     // В любом случае пробуем через 500мс
     const forcePlayTimeout = setTimeout(() => {
@@ -62,10 +64,34 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       }
     }, 500);
 
+    // Fallback hack для обхода content isolation: скрытый вспомогательный элемент
+    const helperVideo = document.createElement('video');
+    helperVideo.srcObject = stream;
+    helperVideo.muted = true;
+    helperVideo.autoplay = true;
+    helperVideo.playsInline = true;
+    Object.assign(helperVideo.style, {
+      position: 'absolute',
+      width: '1px',
+      height: '1px',
+      opacity: '0.001',
+      pointerEvents: 'none',
+    });
+    document.body.appendChild(helperVideo);
+
+    helperVideo.play().catch(err => {
+      console.warn('⚠️ Helper video failed to play:', err);
+    });
+
     return () => {
       clearTimeout(forcePlayTimeout);
       video.onloadedmetadata = null;
       video.srcObject = null;
+      try {
+        document.body.removeChild(helperVideo);
+      } catch (e) {
+        // Ignore if already removed
+      }
     };
   }, [stream, participantId]);
 

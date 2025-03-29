@@ -8,6 +8,7 @@ interface RemoteVideoProps {
 export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -30,7 +31,6 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         });
     };
 
-    // Обработчики
     const handleLoaded = () => {
       console.log(`✅ Metadata for ${participantId}:`, {
         w: video.videoWidth,
@@ -44,7 +44,6 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
 
     video.onloadedmetadata = handleLoaded;
 
-    // Старт воспроизведения
     setTimeout(tryPlay, 150);
 
     return () => {
@@ -52,6 +51,48 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       video.srcObject = null;
     };
   }, [stream]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !stream) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = 160;
+    canvas.height = 120;
+
+    console.log(`🖼️ Canvas debug started for ${participantId}`);
+
+    const drawFrame = () => {
+      try {
+        if (video.videoWidth > 0 && video.videoHeight > 0) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          console.log(`🎨 Drew frame for ${participantId}: ${video.videoWidth}x${video.videoHeight}`);
+        } else {
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.strokeStyle = 'red';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(canvas.width, canvas.height);
+          ctx.moveTo(canvas.width, 0);
+          ctx.lineTo(0, canvas.height);
+          ctx.stroke();
+        }
+      } catch (e) {
+        console.error(`Error drawing to canvas for ${participantId}:`, e);
+      }
+    };
+
+    const interval = setInterval(drawFrame, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [stream, participantId]);
 
   return (
     <div
@@ -78,6 +119,20 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
           minHeight: '120px',
           backgroundColor: '#000',
           border: isVideoReady ? '1px solid transparent' : '1px solid #555',
+        }}
+      />
+
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          bottom: '8px',
+          right: '8px',
+          border: '1px solid green',
+          width: '160px',
+          height: '120px',
+          display: 'block',
+          zIndex: 5,
         }}
       />
 

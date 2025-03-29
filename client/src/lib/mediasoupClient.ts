@@ -682,54 +682,43 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
           // Force track compatibility - максимально возможное включение трека
           consumer.track.enabled = true;
           
-          // Попытка обойти ограничения через contentHint и constraintsObject
-          // Это сообщает браузеру, что трек важен для пользовательского опыта
+          // Simpler approach: создаем вспомогательный видеоэлемент для преодоления ограничений
           try {
-            // Установка всех возможных content hints для максимальной совместимости
-            consumer.track.contentHint = 'motion';
+            // Создаем вспомогательный видеоэлемент
+            const videoEl = document.createElement('video');
+            videoEl.autoplay = true;
+            videoEl.muted = true;
+            videoEl.playsInline = true;
+            videoEl.style.width = '2px';
+            videoEl.style.height = '2px';
+            videoEl.style.position = 'fixed';
+            videoEl.style.opacity = '0.01';
+            videoEl.style.pointerEvents = 'none';
             
-            // ⚠️ Убрано применение ограничений, так как это вызывает OverconstrainedError
-            // const constraints = {
-            //   width: { ideal: 640 },
-            //   height: { ideal: 480 },
-            //   frameRate: { ideal: 30 },
-            //   aspectRatio: { ideal: 1.3333333333 }
-            // };
+            // Создаем новый поток для этого видео
+            const tempStream = new MediaStream([consumer.track]);
+            videoEl.srcObject = tempStream;
             
-            // if (consumer.track.applyConstraints) {
-            //   consumer.track.applyConstraints(constraints)
-            //     .catch(e => console.warn('Could not apply constraints:', e));
-            // }
+            // Добавляем элемент в DOM ненадолго
+            document.body.appendChild(videoEl);
             
-            // Пробуем изменить ID трека для альтернативной обработки
-            if ('id' in consumer.track) {
-              try {
-                // @ts-ignore - нестандартный подход, но иногда помогает
-                consumer.track.id = `forced-${data.participantId}-${Date.now()}`;
-              } catch (e) {}
-            }
-            
-            // Применяем другие нестандартные настройки
-            try {
-              // @ts-ignore - обходной путь для некоторых браузеров
-              consumer.track._constraints = {
-                width: { ideal: 640 },
-                height: { ideal: 480 },
-                frameRate: { ideal: 30 },
-                aspectRatio: { ideal: 1.3333333333 }
-              };
-            } catch (e) {}
+            // Запускаем видео
+            videoEl.play()
+              .then(() => {
+                console.log(`✅ Helper video playing for ${data.participantId}`);
+                
+                // Через некоторое время удаляем элемент, но сохраняем трек активным
+                setTimeout(() => {
+                  document.body.removeChild(videoEl);
+                }, 1000);
+              })
+              .catch(err => {
+                console.warn(`Helper video failed for ${data.participantId}:`, err);
+                document.body.removeChild(videoEl);
+              });
           } catch (e) {
-            console.warn('Enhanced content hints and constraints not supported:', e);
+            console.warn(`Helper video technique failed for ${data.participantId}:`, e);
           }
-          
-          // 1. Устанавливаем специальные метаданные для трека
-          try {
-            consumer.track.contentHint = 'detail'; // Альтернативный вариант для некоторых браузеров
-          } catch (e) {}
-          
-          // Логируем информацию о попытке обойти ограничения
-          console.log(`Applied aggressive security bypass techniques for ${data.participantId}. Video may still appear directly in <video> elements despite restrictions.`);
         }
       }
     } catch (err) {
@@ -740,13 +729,28 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
     const stream = new MediaStream([consumer.track]);
     console.log(`Created MediaStream from consumer track, kind: ${consumer.track.kind}, active: ${stream.active}`);
     
-    // Debug stream tracks
+    // Debug stream tracks and attempt to fix muted issues
     stream.getTracks().forEach((track, index) => {
-      console.log(`Stream track ${index}: kind=${track.kind}, enabled=${track.enabled}, readyState=${track.readyState}`);
+      console.log(`Stream track ${index}: kind=${track.kind}, enabled=${track.enabled}, readyState=${track.readyState}, muted=${track.muted}`);
+      
+      if (track.muted) {
+        console.log(`⚠️ Track ${index} from ${data.participantId} is muted! Attempting to fix...`);
+        
+        // Try force-enabling the track several times
+        track.enabled = true;
+        
+        // Check if the track is still muted after enabling
+        setTimeout(() => {
+          console.log(`🔄 Re-checking track ${index} from ${data.participantId} - muted: ${track.muted}, enabled: ${track.enabled}`);
+        }, 500);
+      }
       
       // Add event listeners for track events
       track.onended = () => console.log(`Track ${index} from ${data.participantId} ended`);
-      track.onmute = () => console.log(`Track ${index} from ${data.participantId} muted`);
+      track.onmute = () => {
+        console.log(`Track ${index} from ${data.participantId} muted`);
+        track.enabled = true; // Try to force-enable when it gets muted
+      };
       track.onunmute = () => console.log(`Track ${index} from ${data.participantId} unmuted`);
     });
     

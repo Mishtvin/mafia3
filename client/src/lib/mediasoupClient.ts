@@ -31,7 +31,7 @@ let device: Device | null = null;
 let socket: WebSocket | null = null;
 let producerTransport: any = null;
 let videoProducer: any = null;
-let recvTransport: any = null; // Единый транспорт для всех входящих потоков
+let participantRecvTransports: Map<string, any> = new Map(); // Транспорт по participant ID
 let consumers: Map<string, any> = new Map();
 let config: MediasoupClientConfig | null = null;
 let localStream: MediaStream | null = null;
@@ -288,23 +288,43 @@ export async function disconnect(): Promise<void> {
   
   // Close producers
   if (videoProducer) {
-    videoProducer.close();
+    try {
+      videoProducer.close();
+    } catch (e) {
+      console.warn('Error closing producer:', e);
+    }
     videoProducer = null;
   }
 
   // Close consumer transports and consumers
-  consumers.forEach(consumer => consumer.close());
+  const consumersArray = Array.from(consumers.values());
+  for (const consumer of consumersArray) {
+    try {
+      consumer.close();
+    } catch (e) {
+      console.warn('Error closing consumer:', e);
+    }
+  }
   consumers.clear();
   
-  // Close receive transport
-  if (recvTransport) {
-    recvTransport.close();
-    recvTransport = null;
+  // Close receive transports
+  const transportsArray = Array.from(participantRecvTransports.values());
+  for (const transport of transportsArray) {
+    try {
+      transport.close();
+    } catch (e) {
+      console.warn('Error closing transport:', e);
+    }
   }
+  participantRecvTransports.clear();
 
   // Close producer transport
   if (producerTransport) {
-    producerTransport.close();
+    try {
+      producerTransport.close();
+    } catch (e) {
+      console.warn('Error closing producer transport:', e);
+    }
     producerTransport = null;
   }
 
@@ -333,6 +353,9 @@ export async function disconnect(): Promise<void> {
   device = null;
   
   console.log('Disconnected from server');
+  
+  // Notify app that we're disconnected
+  config?.onDisconnect();
 }
 
 export function close(): void {
@@ -584,14 +607,28 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
   console.log(`Processing consume response for producer ${data.producerId} from participant ${data.participantId}`);
   
   try {
-    // Создаем единый receive транспорт, если он еще не существует
+    // Проверяем, есть ли уже транспорт для этого участника
+    let recvTransport = participantRecvTransports.get(data.participantId);
+    
+    // Если нет, создаем новый транспорт для этого участника
     if (!recvTransport) {
-      console.log(`Creating new receive transport (common for all producers)`);
-      recvTransport = device!.createRecvTransport(data.transportOptions);
+      console.log(`Creating new receive transport for participant ${data.participantId}`);
+      recvTransport = device!.createRecvTransport({
+        id: data.transportOptions.id,
+        iceParameters: data.transportOptions.iceParameters,
+        iceCandidates: data.transportOptions.iceCandidates,
+        dtlsParameters: data.transportOptions.dtlsParameters,
+        // Явно указываем, что используем Unified Plan
+        additionalSettings: {
+          rtcConfiguration: {
+            sdpSemantics: 'unified-plan'
+          }
+        }
+      });
       
       recvTransport.on('connect', ({ dtlsParameters }: any, callback: any, errback: any) => {
         try {
-          console.log(`Connecting receive transport ${recvTransport.id}`);
+          console.log(`Connecting receive transport ${recvTransport.id} for participant ${data.participantId}`);
           // Signal transport connection to server
           const connectMessage: ConnectTransportMessage = {
             type: MessageType.CONNECT_TRANSPORT,
@@ -605,10 +642,14 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
           errback(error);
         }
       });
+      
+      // Сохраняем транспорт для данного участника
+      participantRecvTransports.set(data.participantId, recvTransport);
     }
     
     // Consume the track
     console.log(`Consuming track with ID ${data.id}, producer ${data.producerId}, kind ${data.kind}`);
+    
     const consumer = await recvTransport.consume({
       id: data.id,
       producerId: data.producerId,
@@ -736,6 +777,9 @@ function handleProducerClosed(data: { producerId: string, participantId: string 
     // Notify app that the remote stream is gone
     config?.onRemoteStreamClosed(data.participantId);
     
+    // Примечание: транспорт НЕ закрываем, т.к. он может обслуживать
+    // другие потоки от того же участника
+    
   } catch (error: any) {
     console.error(`Error handling producer closed: ${error.message}`);
   }
@@ -743,6 +787,8 @@ function handleProducerClosed(data: { producerId: string, participantId: string 
 
 // Handle produce response
 function handleProduceResponse(data: ProduceResponse): void {
+  console.log(`Received produce response for ID: ${data.id}`);
+  
   if (producerTransport && producerTransport._pendingCallback) {
     producerTransport._pendingCallback({ id: data.id });
     producerTransport._pendingCallback = null;

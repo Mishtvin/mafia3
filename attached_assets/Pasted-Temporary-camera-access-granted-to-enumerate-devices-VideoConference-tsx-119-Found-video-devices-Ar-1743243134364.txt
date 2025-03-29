@@ -1,0 +1,159 @@
+Temporary camera access granted to enumerate devices
+VideoConference.tsx:119 Found video devices: Array(5)
+VideoConference.tsx:123 Setting default camera to: a3cafd05576b78fa6ccfdb17d09598d0713f12c415cd43935f798ad40f70b67c
+VideoGrid.tsx:16 VideoGrid: Remote participants updated. Total: 0
+VideoGrid.tsx:24 VideoGrid: Local stream attached to video element
+mediasoupClient.ts:191 Sent message to server: join
+mediasoupClient.ts:76 Received message from server: welcome Object
+mediasoupClient.ts:84 Received welcome message with router capabilities
+mediasoupClient.ts:229 Sending join message with RTP capabilities
+mediasoupClient.ts:191 Sent message to server: join
+mediasoupClient.ts:191 Sent message to server: connect-transport
+mediasoupClient.ts:191 Sent message to server: produce
+mediasoupClient.ts:76 Received message from server: new-producer Object
+mediasoupClient.ts:88 Received new producer notification: Object
+mediasoupClient.ts:286 New producer notification received. Producer ID: 0e7c680d-14fa-4596-b69f-6ad4428c444c, Participant ID: user-1v9tya31w
+mediasoupClient.ts:319 Requesting to consume producer 0e7c680d-14fa-4596-b69f-6ad4428c444c from participant user-1v9tya31w
+mediasoupClient.ts:191 Sent message to server: request-consume
+mediasoupClient.ts:76 Received message from server: produce-response Object
+mediasoupClient.ts:96 Received produce response for ID: 503830ca-07cc-4bb0-b104-7d03c1630aa5
+mediasoupClient.ts:76 Received message from server: consume-response Object
+mediasoupClient.ts:92 Received consume response: c5561861-6982-451f-8b2f-8525f467b1ff
+mediasoupClient.ts:337 Processing consume response for producer 0e7c680d-14fa-4596-b69f-6ad4428c444c from participant user-1v9tya31w
+mediasoupClient.ts:343 Creating new receive transport for producer 0e7c680d-14fa-4596-b69f-6ad4428c444c
+mediasoupClient.ts:367 Consuming track with ID c5561861-6982-451f-8b2f-8525f467b1ff, producer 0e7c680d-14fa-4596-b69f-6ad4428c444c, kind video
+mediasoupClient.ts:348 Connecting receive transport 97088058-65b0-4f60-b7fc-abab670ccff5 for producer 0e7c680d-14fa-4596-b69f-6ad4428c444c
+mediasoupClient.ts:191 Sent message to server: connect-transport
+mediasoupClient.ts:375 Consumer created with ID c5561861-6982-451f-8b2f-8525f467b1ff for producer 0e7c680d-14fa-4596-b69f-6ad4428c444c
+mediasoupClient.ts:385 Consumer track details - enabled: true, readyState: live, kind: video
+mediasoupClient.ts:391 Track settings for user-1v9tya31w: Object
+mediasoupClient.ts:418 Created MediaStream from consumer track, kind: video, active: true
+mediasoupClient.ts:422 Stream track 0: kind=video, enabled=true, readyState=live
+mediasoupClient.ts:431 Notifying application about new remote stream from participant user-1v9tya31w
+VideoConference.tsx:52 Received remote stream from participant user-1v9tya31w
+VideoConference.tsx:56 Added stream from user-1v9tya31w, total streams: 1
+mediasoupClient.ts:436 Consumer for user-1v9tya31w resumed
+VideoGrid.tsx:16 VideoGrid: Remote participants updated. Total: 1
+RemoteVideo.tsx:19 RemoteVideo: Stream for user-1v9tya31w - active: true, tracks: 1
+RemoteVideo.tsx:31 RemoteVideo: Track 0 for user-1v9tya31w - kind: video, enabled: true, readyState: live
+RemoteVideo.tsx:75 RemoteVideo: Testing canvas capture for user-1v9tya31w
+RemoteVideo.tsx:193 RemoteVideo: Setting up video for participant user-1v9tya31w
+RemoteVideo.tsx:220 RemoteVideo: Attaching stream for user-1v9tya31w
+RemoteVideo.tsx:224 RemoteVideo: Attempting to play video for user-1v9tya31w immediately
+RemoteVideo.tsx:343 RemoteVideo: Playback waiting for user-1v9tya31w
+RemoteVideo.tsx:60 RemoteVideo: Initial video check for user-1v9tya31w
+RemoteVideo.tsx:19 RemoteVideo: Stream for user-1v9tya31w - active: true, tracks: 1
+RemoteVideo.tsx:31 RemoteVideo: Track 0 for user-1v9tya31w - kind: video, enabled: true, readyState: live
+RemoteVideo.tsx:75 RemoteVideo: Testing canvas capture for user-1v9tya31w
+2RemoteVideo.tsx:90 RemoteVideo: Canvas test for user-1v9tya31w - has data: false
+RemoteVideo.tsx:35 RemoteVideo: Track 0 muted for user-1v9tya31w
+9RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+mediasoupClient.ts:76 Received message from server: new-producer Object
+mediasoupClient.ts:88 Received new producer notification: Object
+mediasoupClient.ts:286 New producer notification received. Producer ID: 3372de87-6816-4ffd-8426-155c21ca688c, Participant ID: user-4c9f11paq
+mediasoupClient.ts:319 Requesting to consume producer 3372de87-6816-4ffd-8426-155c21ca688c from participant user-4c9f11paq
+mediasoupClient.ts:191 Sent message to server: request-consume
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+mediasoupClient.ts:76 Received message from server: consume-response Object
+mediasoupClient.ts:92 Received consume response: c38caac5-5d59-4d4d-b3cd-aeb2752b869d
+mediasoupClient.ts:337 Processing consume response for producer 3372de87-6816-4ffd-8426-155c21ca688c from participant user-4c9f11paq
+mediasoupClient.ts:343 Creating new receive transport for producer 3372de87-6816-4ffd-8426-155c21ca688c
+mediasoupClient.ts:367 Consuming track with ID c38caac5-5d59-4d4d-b3cd-aeb2752b869d, producer 3372de87-6816-4ffd-8426-155c21ca688c, kind video
+mediasoupClient.ts:348 Connecting receive transport 9abfffee-3341-4edb-82fd-ab6c9c1f999d for producer 3372de87-6816-4ffd-8426-155c21ca688c
+mediasoupClient.ts:191 Sent message to server: connect-transport
+mediasoupClient.ts:375 Consumer created with ID c38caac5-5d59-4d4d-b3cd-aeb2752b869d for producer 3372de87-6816-4ffd-8426-155c21ca688c
+mediasoupClient.ts:385 Consumer track details - enabled: true, readyState: live, kind: video
+mediasoupClient.ts:391 Track settings for user-4c9f11paq: Object
+mediasoupClient.ts:418 Created MediaStream from consumer track, kind: video, active: true
+mediasoupClient.ts:422 Stream track 0: kind=video, enabled=true, readyState=live
+mediasoupClient.ts:431 Notifying application about new remote stream from participant user-4c9f11paq
+VideoConference.tsx:52 Received remote stream from participant user-4c9f11paq
+VideoConference.tsx:56 Added stream from user-4c9f11paq, total streams: 2
+mediasoupClient.ts:436 Consumer for user-4c9f11paq resumed
+VideoGrid.tsx:16 VideoGrid: Remote participants updated. Total: 2
+RemoteVideo.tsx:19 RemoteVideo: Stream for user-4c9f11paq - active: true, tracks: 1
+RemoteVideo.tsx:31 RemoteVideo: Track 0 for user-4c9f11paq - kind: video, enabled: true, readyState: live
+RemoteVideo.tsx:75 RemoteVideo: Testing canvas capture for user-4c9f11paq
+RemoteVideo.tsx:193 RemoteVideo: Setting up video for participant user-4c9f11paq
+RemoteVideo.tsx:220 RemoteVideo: Attaching stream for user-4c9f11paq
+RemoteVideo.tsx:224 RemoteVideo: Attempting to play video for user-4c9f11paq immediately
+RemoteVideo.tsx:343 RemoteVideo: Playback waiting for user-4c9f11paq
+RemoteVideo.tsx:60 RemoteVideo: Initial video check for user-4c9f11paq
+RemoteVideo.tsx:19 RemoteVideo: Stream for user-4c9f11paq - active: true, tracks: 1
+RemoteVideo.tsx:31 RemoteVideo: Track 0 for user-4c9f11paq - kind: video, enabled: true, readyState: live
+RemoteVideo.tsx:75 RemoteVideo: Testing canvas capture for user-4c9f11paq
+RemoteVideo.tsx:90 RemoteVideo: Canvas test for user-4c9f11paq - has data: false
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:90 RemoteVideo: Canvas test for user-4c9f11paq - has data: false
+RemoteVideo.tsx:35 RemoteVideo: Track 0 muted for user-4c9f11paq
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-4c9f11paq - dimensions: 0x0, time: 0
+mediasoupClient.ts:76 Received message from server: producer-closed Object
+mediasoupClient.ts:100 Producer closed: Object
+mediasoupClient.ts:446 Producer closed: 3372de87-6816-4ffd-8426-155c21ca688c from participant user-4c9f11paq
+mediasoupClient.ts:450 Closing consumer for producer 3372de87-6816-4ffd-8426-155c21ca688c
+mediasoupClient.ts:453 Consumer deleted, remaining consumers: 1
+mediasoupClient.ts:460 Closing transport for producer 3372de87-6816-4ffd-8426-155c21ca688c
+mediasoupClient.ts:463 Transport deleted, remaining transports: 1
+mediasoupClient.ts:469 Notifying application about closed stream from participant user-4c9f11paq
+VideoConference.tsx:61 Remote stream closed for participant user-4c9f11paq
+VideoConference.tsx:65 Removed stream from user-4c9f11paq, total streams: 1
+RemoteVideo.tsx:342 RemoteVideo: Playback suspended for user-4c9f11paq
+VideoGrid.tsx:16 VideoGrid: Remote participants updated. Total: 1
+mediasoupClient.ts:76 Received message from server: disconnect Object
+mediasoupClient.ts:105 Participant disconnected: user-4c9f11paq
+VideoConference.tsx:61 Remote stream closed for participant user-4c9f11paq
+VideoConference.tsx:65 Removed stream from user-4c9f11paq, total streams: 1
+RemoteVideo.tsx:227 RemoteVideo: Successfully playing video for user-4c9f11paq
+VideoGrid.tsx:16 VideoGrid: Remote participants updated. Total: 1
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+mediasoupClient.ts:76 Received message from server: new-producer Object
+mediasoupClient.ts:88 Received new producer notification: Object
+mediasoupClient.ts:286 New producer notification received. Producer ID: e844ce3f-cda0-437c-8296-90837ac5e5af, Participant ID: user-jxbsgd1ik
+mediasoupClient.ts:319 Requesting to consume producer e844ce3f-cda0-437c-8296-90837ac5e5af from participant user-jxbsgd1ik
+mediasoupClient.ts:191 Sent message to server: request-consume
+mediasoupClient.ts:76 Received message from server: consume-response Object
+mediasoupClient.ts:92 Received consume response: 2dd45684-04f4-49f6-9b5c-cb971223133c
+mediasoupClient.ts:337 Processing consume response for producer e844ce3f-cda0-437c-8296-90837ac5e5af from participant user-jxbsgd1ik
+mediasoupClient.ts:343 Creating new receive transport for producer e844ce3f-cda0-437c-8296-90837ac5e5af
+mediasoupClient.ts:367 Consuming track with ID 2dd45684-04f4-49f6-9b5c-cb971223133c, producer e844ce3f-cda0-437c-8296-90837ac5e5af, kind video
+mediasoupClient.ts:348 Connecting receive transport bd999655-661e-4061-b909-39d778ffa46c for producer e844ce3f-cda0-437c-8296-90837ac5e5af
+mediasoupClient.ts:191 Sent message to server: connect-transport
+mediasoupClient.ts:375 Consumer created with ID 2dd45684-04f4-49f6-9b5c-cb971223133c for producer e844ce3f-cda0-437c-8296-90837ac5e5af
+mediasoupClient.ts:385 Consumer track details - enabled: true, readyState: live, kind: video
+mediasoupClient.ts:391 Track settings for user-jxbsgd1ik: Object
+mediasoupClient.ts:418 Created MediaStream from consumer track, kind: video, active: true
+mediasoupClient.ts:422 Stream track 0: kind=video, enabled=true, readyState=live
+mediasoupClient.ts:431 Notifying application about new remote stream from participant user-jxbsgd1ik
+VideoConference.tsx:52 Received remote stream from participant user-jxbsgd1ik
+VideoConference.tsx:56 Added stream from user-jxbsgd1ik, total streams: 2
+mediasoupClient.ts:436 Consumer for user-jxbsgd1ik resumed
+VideoGrid.tsx:16 VideoGrid: Remote participants updated. Total: 2
+RemoteVideo.tsx:19 RemoteVideo: Stream for user-jxbsgd1ik - active: true, tracks: 1
+RemoteVideo.tsx:31 RemoteVideo: Track 0 for user-jxbsgd1ik - kind: video, enabled: true, readyState: live
+RemoteVideo.tsx:75 RemoteVideo: Testing canvas capture for user-jxbsgd1ik
+RemoteVideo.tsx:193 RemoteVideo: Setting up video for participant user-jxbsgd1ik
+RemoteVideo.tsx:220 RemoteVideo: Attaching stream for user-jxbsgd1ik
+RemoteVideo.tsx:224 RemoteVideo: Attempting to play video for user-jxbsgd1ik immediately
+RemoteVideo.tsx:343 RemoteVideo: Playback waiting for user-jxbsgd1ik
+RemoteVideo.tsx:60 RemoteVideo: Initial video check for user-jxbsgd1ik
+RemoteVideo.tsx:19 RemoteVideo: Stream for user-jxbsgd1ik - active: true, tracks: 1
+RemoteVideo.tsx:31 RemoteVideo: Track 0 for user-jxbsgd1ik - kind: video, enabled: true, readyState: live
+RemoteVideo.tsx:75 RemoteVideo: Testing canvas capture for user-jxbsgd1ik
+RemoteVideo.tsx:90 RemoteVideo: Canvas test for user-jxbsgd1ik - has data: false
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:90 RemoteVideo: Canvas test for user-jxbsgd1ik - has data: false
+RemoteVideo.tsx:35 RemoteVideo: Track 0 muted for user-jxbsgd1ik
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-jxbsgd1ik - dimensions: 0x0, time: 0
+RemoteVideo.tsx:113 RemoteVideo: Video metadata check for user-1v9tya31w - dimensions: 0x0, time: 0

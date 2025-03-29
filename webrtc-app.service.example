@@ -1,0 +1,26 @@
+[Unit]
+Description=WebRTC Video Conference Application
+After=network.target
+
+[Service]
+# Путь до директории с приложением
+WorkingDirectory=/path/to/webrtc-conference
+# Имя пользователя, от которого запускается приложение
+User=nodeuser
+# Команда для запуска приложения
+ExecStart=/usr/bin/node dist/index.js
+# Всегда перезапускать при падении
+Restart=always
+# Переменные окружения
+Environment=NODE_ENV=production
+# Порты для WebRTC
+Environment=RTC_MIN_PORT=40000
+Environment=RTC_MAX_PORT=49999
+# URL для публичного доступа
+Environment=PUBLIC_URL=https://yourdomainname.com
+
+# Важно: Безлимитные файловые дескрипторы для большого количества соединений
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

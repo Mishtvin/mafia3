@@ -1,0 +1,17 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+VideoConference.tsx:104 Temporary camera access granted to enumerate devices
+VideoConference.tsx:119 Found video devices: Array(5)
+VideoConference.tsx:123 Setting default camera to: a3cafd05576b78fa6ccfdb17d09598d0713f12c415cd43935f798ad40f70b67c
+VideoGrid.tsx:16 VideoGrid: Remote participants updated: . Total: 0
+VideoGrid.tsx:24 VideoGrid: Local stream attached to video element
+VideoGrid.tsx:45 VideoGrid: Currently tracking 0 remote video elements
+mediasoupClient.ts:75 Received message from server: welcome Objectdata: {routerRtpCapabilities: {…}, webRtcTransportOptions: {…}}type: "welcome"[[Prototype]]: Object
+mediasoupClient.ts:79 Received welcome message with router capabilities
+mediasoupClient.ts:75 Received message from server: new-producer Objectdata: {producerId: 'efc82d95-0c89-48e0-8a8b-b64facccdd3f', participantId: 'user-v7ckhf2vc'}type: "new-producer"[[Prototype]]: Object
+mediasoupClient.ts:83 Received new producer notification: ObjectparticipantId: "user-v7ckhf2vc"producerId: "efc82d95-0c89-48e0-8a8b-b64facccdd3f"[[Prototype]]: Object
+mediasoupClient.ts:234 New producer notification received. Producer ID: efc82d95-0c89-48e0-8a8b-b64facccdd3f, Participant ID: user-v7ckhf2vc
+mediasoupClient.ts:75 Received message from server: new-producer Objectdata: {producerId: '8cbf47fc-93aa-4e96-bee4-ecfe8a00a8a8', participantId: 'user-kay7muhuq'}type: "new-producer"[[Prototype]]: Object
+mediasoupClient.ts:83 Received new producer notification: ObjectparticipantId: "user-kay7muhuq"producerId: "8cbf47fc-93aa-4e96-bee4-ecfe8a00a8a8"[[Prototype]]: Object
+mediasoupClient.ts:234 New producer notification received. Producer ID: 8cbf47fc-93aa-4e96-bee4-ecfe8a00a8a8, Participant ID: user-kay7muhuq
+mediasoupClient.ts:75 Received message from server: produce-response Objectdata: {id: 'b5fd27e5-411c-40e8-99eb-44206c89e07b'}type: "produce-response"[[Prototype]]: Object
+mediasoupClient.ts:91 Received produce response for ID: b5fd27e5-411c-40e8-99eb-44206c89e07b

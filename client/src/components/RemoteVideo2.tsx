@@ -78,27 +78,29 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
       };
     });
     
-    // Новый скрытый видеоэлемент для обхода content isolation
-    const helperVideo = document.createElement("video");
-    helperVideo.muted = true;
-    helperVideo.playsInline = true;
-    helperVideo.autoplay = true;
-    helperVideo.srcObject = stream;
-
-    helperVideo.onloadedmetadata = () => {
-      helperVideo.play()
-        .then(() => {
-          console.log(`✅ Helper video playing for ${participantId}`);
-        })
-        .catch((err) => {
-          console.warn(`⚠️ Helper video failed for ${participantId}:`, err);
-        });
-    };
-
-    document.body.appendChild(helperVideo);
-    
     // Устанавливаем поток как источник видео
     videoElement.srcObject = stream;
+    
+    // Вспомогательный скрытый video-элемент для принудительного воспроизведения
+    const helperVideo = document.createElement('video');
+    helperVideo.autoplay = true;
+    helperVideo.muted = true;
+    helperVideo.playsInline = true;
+    helperVideo.style.position = 'fixed';
+    helperVideo.style.opacity = '0';
+    helperVideo.style.width = '1px';
+    helperVideo.style.height = '1px';
+    helperVideo.style.pointerEvents = 'none';
+
+    const helperStream = new MediaStream();
+    stream.getTracks().forEach(track => helperStream.addTrack(track));
+    helperVideo.srcObject = helperStream;
+
+    document.body.appendChild(helperVideo);
+
+    helperVideo.play()
+      .then(() => console.log(`✅ Helper video playing for ${participantId}`))
+      .catch(err => console.warn(`❌ Helper video failed for ${participantId}:`, err));
     
     // Пытаемся воспроизвести видео сразу
     videoElement.play().catch((error: Error) => {

@@ -698,6 +698,18 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
 
     console.log(`Track state: enabled=${consumer.track.enabled}, readyState=${consumer.track.readyState}, muted=${consumer.track.muted}`);
 
+    // Форсированное переключение enabled для "пробуждения" трека через 1.5 секунды
+    setTimeout(() => {
+      if (consumer.track.muted) {
+        console.warn(`🔁 Track still muted, forcing re-enable for ${data.participantId}`);
+        consumer.track.enabled = false;
+        setTimeout(() => {
+          consumer.track.enabled = true;
+          console.log(`🔄 Re-enabled track for ${data.participantId}, state: muted=${consumer.track.muted}`);
+        }, 50);
+      }
+    }, 1500);
+
     // --- 🩹 Safari / autoplay workaround via hidden video
     const helperVideo = document.createElement('video');
     helperVideo.srcObject = stream;

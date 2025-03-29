@@ -8,6 +8,7 @@ interface RemoteVideoProps {
 export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
   const [showPlayButton, setShowPlayButton] = useState(false);
   const [noStream, setNoStream] = useState(false);
+  const [isKilled, setIsKilled] = useState(false); // Добавляем состояние для killed статуса
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Track video readiness state
@@ -240,11 +241,13 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
               } catch (e) {}
             }
             
-            // Установка content hint для лучшей обработки
-            track.contentHint = 'motion';
+            // Устанавливаем content hint и включаем трек
+            if ('contentHint' in track) {
+              track.contentHint = 'motion';
+            }
             
-            // ВАЖНО: НЕ применяем ограничения, это вызывает OverconstrainedError
-            // Вместо этого принудительно включаем трек
+            // ВАЖНО: Никогда не вызываем applyConstraints - это вызывает ошибки
+            // Просто включаем трек
             track.enabled = true;
           }
         } catch (e) {
@@ -265,56 +268,60 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       console.log(`RemoteVideo: Attaching stream for ${participantId}`);
       videoRef.current.srcObject = stream;
       
-      // Создаем backup canvas для случаев, если video element не работает
-      let canvasBackup: HTMLCanvasElement | null = null;
-      let canvasContext: CanvasRenderingContext2D | null = null;
-      let canvasInterval: number | null = null;
+      // Создаем canvas fallback ВСЕГДА, а не только если video не работает
+      // Это гарантирует, что хоть что-то будет отображаться
+      const canvasBackup = document.createElement('canvas');
+      canvasBackup.width = 640;
+      canvasBackup.height = 360;
+      canvasBackup.style.position = 'absolute';
+      canvasBackup.style.top = '0';
+      canvasBackup.style.left = '0';
+      canvasBackup.style.width = '100%';
+      canvasBackup.style.height = '100%';
+      canvasBackup.style.objectFit = 'cover';
+      canvasBackup.style.zIndex = '2';
       
-      // Обнаружение проблем с отображением видео
-      setTimeout(() => {
-        if (videoRef.current && (!videoRef.current.videoWidth || !videoRef.current.videoHeight)) {
-          console.log(`RemoteVideo: No dimensions detected for ${participantId}, creating canvas fallback`);
-          
-          // Создаем canvas в качестве запасного варианта
-          canvasBackup = document.createElement('canvas');
-          canvasBackup.width = 640;
-          canvasBackup.height = 360;
-          canvasBackup.style.position = 'absolute';
-          canvasBackup.style.top = '0';
-          canvasBackup.style.left = '0';
-          canvasBackup.style.width = '100%';
-          canvasBackup.style.height = '100%';
-          canvasBackup.style.objectFit = 'cover';
-          canvasBackup.style.zIndex = '2';
-          
-          // Добавляем canvas в DOM рядом с video
-          if (videoRef.current.parentNode) {
-            videoRef.current.parentNode.appendChild(canvasBackup);
-            canvasContext = canvasBackup.getContext('2d');
-            
-            // Рисуем видео на canvas через requestAnimationFrame
-            const drawVideoFrame = () => {
-              if (canvasContext && videoRef.current) {
-                try {
-                  canvasContext.drawImage(videoRef.current, 0, 0, canvasBackup!.width, canvasBackup!.height);
-                } catch (e) { }
-                requestAnimationFrame(drawVideoFrame);
-              }
-            };
-            
-            // Начинаем рисовать
+      // Добавляем canvas в DOM рядом с video
+      if (videoRef.current.parentNode) {
+        videoRef.current.parentNode.appendChild(canvasBackup);
+        const canvasContext = canvasBackup.getContext('2d');
+        
+        // Рисуем видео на canvas через requestAnimationFrame
+        const drawVideoFrame = () => {
+          if (canvasContext && videoRef.current) {
+            try {
+              // Рисуем даже если videoWidth/videoHeight = 0
+              canvasContext.drawImage(videoRef.current, 0, 0, canvasBackup.width, canvasBackup.height);
+            } catch (e) { }
             requestAnimationFrame(drawVideoFrame);
           }
+        };
+        
+        // Начинаем рисовать сразу
+        requestAnimationFrame(drawVideoFrame);
+      }
+      
+      // Логи для отладки метаданных видео
+      videoRef.current.onloadedmetadata = () => {
+        console.log(`Video metadata loaded for ${participantId}:`, {
+          width: videoRef.current?.videoWidth,
+          height: videoRef.current?.videoHeight,
+          readyState: videoRef.current?.readyState
+        });
+        
+        // Если у видео есть размеры, скрываем canvas
+        if (videoRef.current?.videoWidth > 0 && videoRef.current?.videoHeight > 0 && canvasBackup) {
+          canvasBackup.style.display = 'none';
         }
-      }, 2000);
+      };
       
       // Force play immediately с несколькими разными стратегиями одновременно
       console.log(`RemoteVideo: Attempting to play video for ${participantId} with enhanced techniques`);
       
-      // 1. Настройка перед воспроизведением
+      // 1. Настройка перед воспроизведением - дублируем атрибуты здесь для надёжности
       videoRef.current.setAttribute('playsinline', '');
       videoRef.current.setAttribute('autoplay', '');
-      videoRef.current.muted = true; // Временно отключаем звук для лучшего автовоспроизведения
+      videoRef.current.muted = true; // Всегда отключаем звук для лучшего автовоспроизведения
       
       // Агрессивная стратегия воспроизведения с несколькими попытками
       const tryPlay = async () => {
@@ -336,7 +343,8 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       tryPlay();
       
       // Затем еще несколько попыток с задержкой
-      setTimeout(() => tryPlay(), 300);
+      setTimeout(() => tryPlay(), 100);
+      setTimeout(() => tryPlay(), 500);
       setTimeout(() => tryPlay(), 1000);
       setTimeout(() => tryPlay(), 2000);
       
@@ -345,14 +353,13 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
         videoRef.current?.removeEventListener('timeupdate', handleTimeUpdate);
         if (videoRef.current) {
           videoRef.current.removeEventListener('error', handleError as EventListener);
+          // Очищаем источник
+          videoRef.current.srcObject = null;
         }
         
         // Очистка canvas
         if (canvasBackup && canvasBackup.parentNode) {
           canvasBackup.parentNode.removeChild(canvasBackup);
-        }
-        if (canvasInterval !== null) {
-          clearInterval(canvasInterval);
         }
       };
     }
@@ -381,70 +388,26 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
   };
   
   return (
-    <div className="bg-[#1a202c] rounded-lg overflow-hidden relative aspect-video shadow-md transition-all duration-300">
+    <div 
+      className={`remote-video-container ${isKilled ? 'killed' : ''} ${isVideoReady ? 'ready' : 'loading'}`} 
+      data-participant-id={participantId}>
+      {/* Улучшенное отображение видео с гарантированной видимостью */}
       <video
         ref={videoRef}
-        className={`w-full h-full bg-black ${isVideoReady ? 'object-contain' : 'object-cover'}`}
-        playsInline
+        className="remote-video"
         autoPlay
-        loop
+        playsInline
+        muted
         style={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "black",
-          display: "block"
-        }}
-        onCanPlay={() => {
-          console.log(`RemoteVideo: onCanPlay fired for ${participantId}`);
-          setIsVideoReady(true);
-        }}
-        onLoadedData={() => {
-          console.log(`RemoteVideo: Data loaded for ${participantId}`);
-          setIsVideoReady(true);
-          
-          // Try forcing repaint of the video element to help with display
-          if (videoRef.current) {
-            const display = videoRef.current.style.display;
-            videoRef.current.style.display = 'none';
-            // Force layout recalculation
-            void videoRef.current.offsetHeight;
-            videoRef.current.style.display = display;
-          }
-        }}
-        onLoadedMetadata={() => {
-          if (videoRef.current) {
-            const width = videoRef.current.videoWidth;
-            const height = videoRef.current.videoHeight;
-            console.log(`RemoteVideo: Metadata loaded for ${participantId} - ${width}x${height}`);
-            
-            // Always consider stream ready after metadata is loaded
-            setIsVideoReady(true);
-            
-            // Force play even if dimensions are still zero (some browsers don't report dimensions correctly)
-            videoRef.current.play().catch(err => {
-              console.warn(`RemoteVideo: Play on metadata loaded failed:`, err);
-            });
-          }
-        }}
-        onStalled={() => {
-          console.warn(`RemoteVideo: Playback stalled for ${participantId}`);
-          if (videoRef.current) {
-            videoRef.current.play().catch(() => {});
-          }
-        }}
-        onSuspend={() => console.log(`RemoteVideo: Playback suspended for ${participantId}`)}
-        onWaiting={() => console.log(`RemoteVideo: Playback waiting for ${participantId}`)}
-        onPlaying={() => {
-          console.log(`RemoteVideo: Playback started for ${participantId}`);
-          setIsVideoReady(true);
-        }}
-        onTimeUpdate={() => {
-          // Set as ready when time changes, even if dimensions are still zero
-          // This is important for some browsers that don't report dimensions correctly
-          if (!isVideoReady && videoRef.current && videoRef.current.currentTime > 0) {
-            console.log(`RemoteVideo: timeupdate with time ${videoRef.current.currentTime} for ${participantId}`);
-            setIsVideoReady(true);
-          }
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          background: '#000',
+          display: 'block', // Гарантировать, что видео видимо
+          visibility: 'visible', // Дополнительное свойство для видимости
+          opacity: '1', // Гарантировать, что видео не прозрачно
+          transform: 'translateZ(0)', // Включить hardware acceleration
+          zIndex: '1'
         }}
       />
       

@@ -29,45 +29,6 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
     setVideoError(null);
   }, [stream]);
 
-  // Обход content isolation — добавление helperVideo
-  useEffect(() => {
-    if (!stream) return;
-
-    const helperVideo = document.createElement("video");
-    helperVideo.srcObject = stream;
-    helperVideo.autoplay = true;
-    helperVideo.muted = true;
-    helperVideo.playsInline = true;
-
-    Object.assign(helperVideo.style, {
-      position: "absolute",
-      width: "1px",
-      height: "1px",
-      top: "0",
-      left: "0",
-      opacity: "0.01",
-      zIndex: "-9999",
-      pointerEvents: "none",
-    });
-
-    document.body.appendChild(helperVideo);
-
-    // Используем onloadedmetadata для гарантированного "разогрева"
-    helperVideo.onloadedmetadata = () => {
-      helperVideo.play()
-        .then(() => {
-          console.log(`✅ Helper video playing for ${participantId}`);
-        })
-        .catch((err) => {
-          console.warn(`⚠️ Helper video failed for ${participantId}:`, err);
-        });
-    };
-
-    return () => {
-      document.body.removeChild(helperVideo);
-    };
-  }, [stream, participantId]);
-
   // Эффект для подключения потока к видеоэлементу
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -95,6 +56,25 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
         console.log(`RemoteVideo: Track ${i} ended for ${participantId}`);
       };
     });
+    
+    // Новый скрытый видеоэлемент
+    const helperVideo = document.createElement("video");
+    helperVideo.muted = true;
+    helperVideo.playsInline = true;
+    helperVideo.autoplay = true;
+    helperVideo.srcObject = stream;
+
+    helperVideo.onloadedmetadata = () => {
+      helperVideo.play()
+        .then(() => {
+          console.log(`✅ Helper video playing for ${participantId}`);
+        })
+        .catch(err => {
+          console.warn(`⚠️ Helper video failed for ${participantId}:`, err);
+        });
+    };
+
+    document.body.appendChild(helperVideo);
     
     // Тест с канвасом для проверки, получаем ли мы реальные пиксели из видеопотока
     const canvas = canvasRef.current;
@@ -141,15 +121,13 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
           return;
         }
         
-        await videoElement.play()
-          .then(() => {
-            console.log(`RemoteVideo: Video playback started for ${participantId}`);
-            // Переносим проверки canvas сюда, чтобы выполнялись после начала воспроизведения
-            if (canvas && checkVideoContent) {
-              setTimeout(checkVideoContent, 1000);
-              setTimeout(checkVideoContent, 3000);
-            }
-          });
+        await videoElement.play();
+        console.log(`RemoteVideo: Video playback started for ${participantId}`);
+        // Проверки canvas после начала воспроизведения
+        if (canvas && checkVideoContent) {
+          setTimeout(checkVideoContent, 1000);
+          setTimeout(checkVideoContent, 3000);
+        }
       } catch (error: any) {
         setPlayAttempts(prev => prev + 1);
         console.error(`RemoteVideo: Error playing video for ${participantId}:`, error.message);
@@ -160,21 +138,31 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
       }
     };
     
+    // Запускаем воспроизведение
     playVideo();
     
+    // Очистка при размонтировании компонента
     return () => {
-      // Отписываемся от всех событий при размонтировании
       stream.getTracks().forEach(track => {
         track.onmute = null;
         track.onunmute = null;
         track.onended = null;
       });
       
-      console.log(`RemoteVideo: Playback suspended for ${participantId}`);
       videoElement.pause();
       videoElement.srcObject = null;
+      
+      helperVideo.pause();
+      helperVideo.srcObject = null;
+      try {
+        document.body.removeChild(helperVideo);
+      } catch (e) {
+        // Игнорируем ошибку, если элемент уже удален
+      }
+      
+      console.log(`RemoteVideo: Playback suspended for ${participantId}`);
     };
-  }, [stream, participantId, playAttempts]);
+  }, [stream, participantId, playAttempts, maxPlayAttempts]);
 
   // Получаем инициалы из отображаемого имени
   const getInitials = (name: string) => {

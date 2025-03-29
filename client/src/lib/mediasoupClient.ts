@@ -657,6 +657,33 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
     const stream = new MediaStream([consumer.track]);
     consumer.track.enabled = true;
 
+    // Aggressive track unmuting
+    if (consumer.track.muted) {
+      console.warn(`🔄 Track is muted for ${data.participantId}, forcing unmute techniques`);
+      
+      // 1. Force enabled
+      consumer.track.enabled = true;
+      
+      // 2. Try to request a keyframe if supported
+      try {
+        if ('requestKeyFrame' in consumer.track) {
+          console.log(`📑 Requesting keyframe for ${data.participantId}`);
+          (consumer.track as any).requestKeyFrame();
+        } else if ('getConstraints' in consumer.track) {
+          // Alternative approach for some browsers
+          console.log(`📋 Checking RTCRtpSender for keyframe API`);
+          // Look for associated sender to request keyframe
+          const pc = recvTransport.handler.pc as RTCPeerConnection;
+          const sender = pc.getSenders().find(s => s.track?.id === consumer.track.id);
+          if (sender && 'getParameters' in sender) {
+            console.log(`📊 Found sender, parameters:`, sender.getParameters());
+          }
+        }
+      } catch (e) {
+        console.warn(`❌ Error requesting keyframe:`, e);
+      }
+    }
+
     // 🔁 Debug and handle track states
     consumer.track.onmute = () => {
       console.log(`🔇 Track from ${data.participantId} muted`);
@@ -693,6 +720,48 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
         console.warn(`⚠️ Helper video failed:`, err);
         helperVideo.remove();
       });
+
+    // Create additional direct track helper if track is muted
+    if (consumer.track.muted) {
+      console.log(`🧪 Creating dedicated track helper for muted track from ${data.participantId}`);
+      const trackHelper = document.createElement('video');
+      trackHelper.autoplay = true;
+      trackHelper.playsInline = true;
+      trackHelper.muted = true;
+      
+      // Create new stream with just this track
+      const dedicatedStream = new MediaStream([consumer.track]);
+      trackHelper.srcObject = dedicatedStream;
+      
+      // Style to be invisible but active
+      Object.assign(trackHelper.style, {
+        position: 'absolute',
+        width: '2px',
+        height: '2px',
+        opacity: '0.01',
+        zIndex: '-1000',
+        pointerEvents: 'none'
+      });
+      
+      // Add to DOM to force processing
+      document.body.appendChild(trackHelper);
+      trackHelper.play()
+        .then(() => {
+          console.log(`🔥 Dedicated track helper playing for ${data.participantId}`);
+          
+          // Check if it helped after a delay
+          setTimeout(() => {
+            console.log(`📊 Track status after dedicated helper: muted=${consumer.track.muted}, enabled=${consumer.track.enabled}`);
+            
+            // Remove after a longer period
+            setTimeout(() => trackHelper.remove(), 3000);
+          }, 500);
+        })
+        .catch(err => {
+          console.warn(`❌ Dedicated track helper failed:`, err);
+          trackHelper.remove();
+        });
+    }
 
     // --- ✅ Send stream to app
     console.log(`📦 Notifying application about remote stream from ${data.participantId}`);

@@ -52,7 +52,18 @@ const config = {
         clockRate: 90000,
         parameters: {
           'packetization-mode': 1,
-          'profile-level-id': '4d0032',
+          'profile-level-id': '42e01f',  // Baseline profile для широкой совместимости
+          'level-asymmetry-allowed': 1,
+          'x-google-start-bitrate': 1000
+        }
+      },
+      {
+        kind: 'video',
+        mimeType: 'video/h264',
+        clockRate: 90000,
+        parameters: {
+          'packetization-mode': 1,
+          'profile-level-id': '4d0032',  // High profile для лучшего качества
           'level-asymmetry-allowed': 1,
           'x-google-start-bitrate': 1000
         }
@@ -86,7 +97,8 @@ let router: Router;
 // Participant-specific state
 const participantTransports = new Map<string, {
   sendTransport?: WebRtcTransport;
-  recvTransports: Map<string, WebRtcTransport>; // producerId -> transport
+  recvTransport?: WebRtcTransport; // Единый транспорт для приема
+  consumers: Map<string, Consumer>; // producerId -> consumer
 }>();
 
 const producers = new Map<string, Producer>();
@@ -133,7 +145,7 @@ export async function createTransport(participantId: string): Promise<{
   // Initialize participant state if needed
   if (!participantTransports.has(participantId)) {
     participantTransports.set(participantId, {
-      recvTransports: new Map()
+      consumers: new Map()
     });
   }
   
@@ -153,13 +165,25 @@ export async function createTransport(participantId: string): Promise<{
   };
 }
 
-// Create a transport for consuming
+// Create a transport for consuming (единый для участника)
 export async function createConsumerTransport(
-  participantId: string,
-  producerId: string
+  participantId: string
 ): Promise<{
   webRtcTransportOptions: any;
 }> {
+  // Если транспорт для приема уже существует, возвращаем его параметры
+  const existingData = participantTransports.get(participantId);
+  if (existingData && existingData.recvTransport) {
+    return {
+      webRtcTransportOptions: {
+        id: existingData.recvTransport.id,
+        iceParameters: existingData.recvTransport.iceParameters,
+        iceCandidates: existingData.recvTransport.iceCandidates,
+        dtlsParameters: existingData.recvTransport.dtlsParameters,
+      }
+    };
+  }
+
   // Create transport options based on config
   const transportOptions = {
     ...config.webRtcTransport,
@@ -174,13 +198,15 @@ export async function createConsumerTransport(
   // Initialize participant state if needed
   if (!participantTransports.has(participantId)) {
     participantTransports.set(participantId, {
-      recvTransports: new Map()
+      consumers: new Map()
     });
   }
   
   // Store the transport
-  const participantData = participantTransports.get(participantId)!;
-  participantData.recvTransports.set(producerId, transport);
+  const participantData = participantTransports.get(participantId);
+  if (participantData) {
+    participantData.recvTransport = transport;
+  }
   
   // Return transport parameters
   return {
@@ -206,14 +232,10 @@ export async function connectTransport(transportId: string, dtlsParameters: any)
     }
     
     // Check in receive transports
-    for (const [producerId, recvTransport] of data.recvTransports.entries()) {
-      if (recvTransport.id === transportId) {
-        transport = recvTransport;
-        break;
-      }
+    if (data.recvTransport?.id === transportId) {
+      transport = data.recvTransport;
+      break;
     }
-    
-    if (transport) break;
   }
   
   if (!transport) {
@@ -270,54 +292,41 @@ export async function consume(
   kind: 'audio' | 'video';
   rtpParameters: any;
 }> {
-  // Check if the participant can consume the producer
-  if (!router.canConsume({
-    producerId,
-    rtpCapabilities
-  })) {
-    throw new Error(`Cannot consume producer: ${producerId}`);
+  // Check if the participant exists
+  if (!participantTransports.has(participantId)) {
+    throw new Error(`Participant ${participantId} not found`);
   }
   
-  // Get the participant data
-  const participantData = participantTransports.get(participantId);
-  if (!participantData) {
-    throw new Error(`Participant not found: ${participantId}`);
+  // Get participant data
+  const participantData = participantTransports.get(participantId)!;
+  
+  // Check if recvTransport exists
+  if (!participantData.recvTransport) {
+    throw new Error(`Receive transport for participant ${participantId} not found`);
   }
   
-  // Get the transport - we need to access the last created transport for this participant
-  // This is because we're creating a new transport for each consume request on the client
-  // but the client references the same producerId
-  let transport = participantData.recvTransports.get(producerId);
-  
-  // If we don't find a transport keyed specifically by producerId, 
-  // just use the most recently created one
-  if (!transport && participantData.recvTransports.size > 0) {
-    // Get the last created transport
-    const transports = Array.from(participantData.recvTransports.values());
-    transport = transports[transports.length - 1];
-    console.log(`Using fallback transport for producer ${producerId}`);
-  }
-  
-  if (!transport) {
-    throw new Error(`Receive transport not found for producer: ${producerId}`);
+  // Check if router can consume the producer with the participant's capabilities
+  if (!router.canConsume({ producerId, rtpCapabilities })) {
+    throw new Error(`Cannot consume producer ${producerId} with the given RTP capabilities`);
   }
   
   // Create consumer
-  const consumer = await transport.consume({
+  const consumer = await participantData.recvTransport.consume({
     producerId,
     rtpCapabilities,
-    paused: false // automatically start consuming
+    paused: false, // Сразу запускаем потребление
   });
   
   // Store the consumer
   consumers.set(consumer.id, consumer);
+  participantData.consumers.set(producerId, consumer);
   
   // Return consumer parameters
   return {
     id: consumer.id,
-    producerId: consumer.producerId,
+    producerId,
     kind: consumer.kind,
-    rtpParameters: consumer.rtpParameters
+    rtpParameters: consumer.rtpParameters,
   };
 }
 
@@ -340,34 +349,56 @@ export async function closeProducer(producerId: string): Promise<void> {
 
 // Clean up resources for a participant
 export async function removeParticipant(participantId: string): Promise<void> {
+  // Get participant data
   const participantData = participantTransports.get(participantId);
   if (!participantData) return;
+  
+  // Close all consumers
+  const consumersArray = Array.from(participantData.consumers.values());
+  for (const consumer of consumersArray) {
+    consumer.close();
+    if (consumer.id) {
+      consumers.delete(consumer.id);
+    }
+  }
   
   // Close send transport
   if (participantData.sendTransport) {
     participantData.sendTransport.close();
   }
   
-  // Close receive transports
-  for (const transport of participantData.recvTransports.values()) {
-    transport.close();
+  // Close receive transport
+  if (participantData.recvTransport) {
+    participantData.recvTransport.close();
   }
   
-  // Remove participant data
+  // Remove participant from map
   participantTransports.delete(participantId);
+  
+  console.log(`Participant ${participantId} removed`);
 }
 
 // Shutdown mediasoup
 export async function shutdown(): Promise<void> {
-  // Close all transports, producers and consumers
-  for (const participantId of participantTransports.keys()) {
+  console.log('Shutting down mediasoup...');
+  
+  // Close all transports
+  const entries = Array.from(participantTransports.entries());
+  for (const [participantId, data] of entries) {
     await removeParticipant(participantId);
   }
   
   // Close all workers
-  for (const worker of workers) {
+  const workerArray = Array.from(workers);
+  for (const worker of workerArray) {
     worker.close();
   }
   
+  // Clear global state
   workers = [];
+  participantTransports.clear();
+  producers.clear();
+  consumers.clear();
+  
+  console.log('Mediasoup shutdown complete');
 }

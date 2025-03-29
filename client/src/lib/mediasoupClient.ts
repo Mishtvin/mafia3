@@ -31,7 +31,7 @@ let device: Device | null = null;
 let socket: WebSocket | null = null;
 let producerTransport: any = null;
 let videoProducer: any = null;
-let consumerTransports: Map<string, any> = new Map();
+let recvTransport: any = null; // Единый транспорт для всех входящих потоков
 let consumers: Map<string, any> = new Map();
 let config: MediasoupClientConfig | null = null;
 let localStream: MediaStream | null = null;
@@ -296,8 +296,11 @@ export async function disconnect(): Promise<void> {
   consumers.forEach(consumer => consumer.close());
   consumers.clear();
   
-  consumerTransports.forEach(transport => transport.close());
-  consumerTransports.clear();
+  // Close receive transport
+  if (recvTransport) {
+    recvTransport.close();
+    recvTransport = null;
+  }
 
   // Close producer transport
   if (producerTransport) {
@@ -535,52 +538,44 @@ async function handleWelcomeMessage(data: ServerInitResponse): Promise<void> {
 
 // Handle new producer notification
 async function handleNewProducer(data: { producerId: string, participantId: string }): Promise<void> {
-  console.log(`New producer notification received. Producer ID: ${data.producerId}, Participant ID: ${data.participantId}`);
-  
-  if (!device || !device.loaded) {
-    console.error('Device not loaded yet, cannot consume');
-    return;
-  }
+  console.log(`Detected new producer: ${data.producerId} from participant ${data.participantId}`);
   
   try {
-    // Check if the device can receive media
-    if (!device.rtpCapabilities || !device.rtpCapabilities.codecs || device.rtpCapabilities.codecs.length === 0) {
-      console.warn('Device cannot receive media streams');
-      return;
-    }
-  } catch (error) {
-    console.error('Error checking device capabilities:', error);
-    return;
-  }
-  
-  try {
-    // Check if we're already consuming this producer
-    if (consumers.has(data.producerId)) {
-      console.log(`Already consuming producer ${data.producerId}, skipping duplicate request`);
+    // Skip if we don't have a device or if the device is not loaded
+    if (!device || !device.loaded) {
+      console.warn('Device not loaded yet, skipping consume request');
       return;
     }
     
-    // Request to consume this producer
-    const requestConsumeMessage: RequestConsumeMessage = {
+    // Skip if we already have a consumer for this producer
+    if (consumers.has(data.producerId)) {
+      console.log(`Already consuming producer ${data.producerId}, skipping`);
+      return;
+    }
+    
+    console.log(`Sending request to consume producer ${data.producerId}`);
+    
+    // Request to consume this new producer
+    const consumeMessage: RequestConsumeMessage = {
       type: MessageType.REQUEST_CONSUME,
       producerId: data.producerId,
-      rtpCapabilities: device.rtpCapabilities,
-      participantId: data.participantId
+      participantId: data.participantId,
+      rtpCapabilities: device.rtpCapabilities
     };
     
-    console.log(`Requesting to consume producer ${data.producerId} from participant ${data.participantId}`);
-    sendMessage(requestConsumeMessage);
+    sendMessage(consumeMessage);
     
-    // Set up a timeout to retry if we don't get a response
+    // Set a timeout to retry if we don't get a response
     setTimeout(() => {
       if (!consumers.has(data.producerId)) {
-        console.warn(`No response received for consumer request after 5s, retrying...`);
-        sendMessage(requestConsumeMessage);
+        console.log(`No response received for consume request for producer ${data.producerId}, trying again`);
+        sendMessage(consumeMessage);
       }
     }, 5000);
+    
   } catch (error: any) {
-    console.error(`Error requesting consumer: ${error.message}`, error);
-    config?.onError(`Error requesting consumer: ${error.message}`);
+    console.error(`Error handling new producer: ${error.message}`);
+    config?.onError(`Error handling new producer: ${error.message}`);
   }
 }
 
@@ -589,15 +584,14 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
   console.log(`Processing consume response for producer ${data.producerId} from participant ${data.participantId}`);
   
   try {
-    // Create a receive transport if it doesn't exist for this producer
-    let recvTransport = consumerTransports.get(data.producerId);
+    // Создаем единый receive транспорт, если он еще не существует
     if (!recvTransport) {
-      console.log(`Creating new receive transport for producer ${data.producerId}`);
+      console.log(`Creating new receive transport (common for all producers)`);
       recvTransport = device!.createRecvTransport(data.transportOptions);
       
       recvTransport.on('connect', ({ dtlsParameters }: any, callback: any, errback: any) => {
         try {
-          console.log(`Connecting receive transport ${recvTransport.id} for producer ${data.producerId}`);
+          console.log(`Connecting receive transport ${recvTransport.id}`);
           // Signal transport connection to server
           const connectMessage: ConnectTransportMessage = {
             type: MessageType.CONNECT_TRANSPORT,
@@ -611,8 +605,6 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
           errback(error);
         }
       });
-      
-      consumerTransports.set(data.producerId, recvTransport);
     }
     
     // Consume the track
@@ -730,31 +722,23 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
 
 // Handle producer closed message
 function handleProducerClosed(data: { producerId: string, participantId: string }): void {
-  console.log(`Producer closed: ${data.producerId} from participant ${data.participantId}`);
+  console.log(`Producer ${data.producerId} from participant ${data.participantId} closed`);
   
-  const consumer = consumers.get(data.producerId);
-  if (consumer) {
-    console.log(`Closing consumer for producer ${data.producerId}`);
-    consumer.close();
-    consumers.delete(data.producerId);
-    console.log(`Consumer deleted, remaining consumers: ${consumers.size}`);
-  } else {
-    console.log(`No consumer found for producer ${data.producerId}`);
+  try {
+    // Get and close the consumer
+    const consumer = consumers.get(data.producerId);
+    if (consumer) {
+      console.log(`Closing consumer for producer ${data.producerId}`);
+      consumer.close();
+      consumers.delete(data.producerId);
+    }
+    
+    // Notify app that the remote stream is gone
+    config?.onRemoteStreamClosed(data.participantId);
+    
+  } catch (error: any) {
+    console.error(`Error handling producer closed: ${error.message}`);
   }
-  
-  const transport = consumerTransports.get(data.producerId);
-  if (transport) {
-    console.log(`Closing transport for producer ${data.producerId}`);
-    transport.close();
-    consumerTransports.delete(data.producerId);
-    console.log(`Transport deleted, remaining transports: ${consumerTransports.size}`);
-  } else {
-    console.log(`No transport found for producer ${data.producerId}`);
-  }
-  
-  // Notify application
-  console.log(`Notifying application about closed stream from participant ${data.participantId}`);
-  config?.onRemoteStreamClosed(data.participantId);
 }
 
 // Handle produce response

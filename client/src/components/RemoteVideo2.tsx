@@ -52,13 +52,16 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
 
     document.body.appendChild(helperVideo);
 
-    helperVideo.play()
-      .then(() => {
-        console.log(`✅ Helper video playing for ${participantId}`);
-      })
-      .catch((err) => {
-        console.warn(`⚠️ Helper video failed for ${participantId}:`, err);
-      });
+    // Используем onloadedmetadata для гарантированного "разогрева"
+    helperVideo.onloadedmetadata = () => {
+      helperVideo.play()
+        .then(() => {
+          console.log(`✅ Helper video playing for ${participantId}`);
+        })
+        .catch((err) => {
+          console.warn(`⚠️ Helper video failed for ${participantId}:`, err);
+        });
+    };
 
     return () => {
       document.body.removeChild(helperVideo);
@@ -95,9 +98,11 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
     
     // Тест с канвасом для проверки, получаем ли мы реальные пиксели из видеопотока
     const canvas = canvasRef.current;
+    let checkVideoContent: () => void;
+    
     if (canvas) {
       console.log(`RemoteVideo: Testing canvas capture for ${participantId}`);
-      const checkVideoContent = () => {
+      checkVideoContent = () => {
         try {
           const ctx = canvas.getContext('2d');
           if (ctx && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
@@ -123,11 +128,6 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
           console.warn(`RemoteVideo: Canvas check error - ${e}`);
         }
       };
-      
-      // Первичная проверка
-      setTimeout(checkVideoContent, 1000);
-      // Повторная проверка через 3 секунды
-      setTimeout(checkVideoContent, 3000);
     }
     
     // Устанавливаем поток как источник видео
@@ -141,8 +141,15 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
           return;
         }
         
-        await videoElement.play();
-        console.log(`RemoteVideo: Video playback started for ${participantId}`);
+        await videoElement.play()
+          .then(() => {
+            console.log(`RemoteVideo: Video playback started for ${participantId}`);
+            // Переносим проверки canvas сюда, чтобы выполнялись после начала воспроизведения
+            if (canvas && checkVideoContent) {
+              setTimeout(checkVideoContent, 1000);
+              setTimeout(checkVideoContent, 3000);
+            }
+          });
       } catch (error: any) {
         setPlayAttempts(prev => prev + 1);
         console.error(`RemoteVideo: Error playing video for ${participantId}:`, error.message);
@@ -217,6 +224,7 @@ export const RemoteVideo = ({ participantId, stream, displayName, onDisplayNameC
         className="w-full h-full object-cover"
         autoPlay
         playsInline
+        muted
       />
       
       {/* Якщо відео не показується, відображаємо аватар з ініціалами */}

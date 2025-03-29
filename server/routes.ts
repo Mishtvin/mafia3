@@ -126,6 +126,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.log(`Participant ${participantId} changed nickname to: ${nicknameData.nickname}`);
               
               // Уведомляем всех остальных участников в комнате
+              // Добавляем подробное логирование для отладки проблемы с изменением имени
+              console.log(`Server: Broadcasting nickname change from ${participantId} to all participants.`);
+              console.log(`Server: New nickname: ${nicknameData.nickname}, previous: ${nicknameData.previousName || 'none'}`);
+              console.log(`Server: Room participants count: ${currentRoom.participants.size}`);
+              
               notifyParticipants(currentRoom, participantId, {
                 type: 'nickname-change',
                 data: {
@@ -467,12 +472,19 @@ function notifyParticipants(room: Room, senderId: string, message: any) {
   let notifiedCount = 0;
   room.participants.forEach((participant, id) => {
     if (id !== senderId) {
-      console.log(`Sending notification to participant ${id}`);
+      console.log(`Sending notification to participant ${id} about ${message.type} from ${senderId}`);
+      
+      // Debugging: Проверка структуры сообщения
+      if (message.type === 'nickname-change') {
+        console.log(`NICKNAME NOTIFICATION DETAILS - To: ${id}, From: ${senderId}`);
+        console.log(`NICKNAME DATA:`, JSON.stringify(message.data, null, 2));
+      }
+      
       sendToClient(participant.socket, message);
       notifiedCount++;
     }
   });
-  console.log(`Notified ${notifiedCount} participants about ${message.type}`);
+  console.log(`Notified ${notifiedCount} participants about ${message.type} from ${senderId}`);
 }
 
 // Generate a random participant ID

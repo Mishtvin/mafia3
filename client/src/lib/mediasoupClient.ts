@@ -151,12 +151,18 @@ export async function connect(stream: MediaStream): Promise<void> {
           case 'nickname-change':
             // Обработка изменения имени участника
             console.log('Nickname changed:', msgData);
+            console.log('Full message data object for nickname:', JSON.stringify(msgData, null, 2));
+            
             if (msgData.isLocalChange) {
               console.log('This is our own nickname change, skipping external notification');
             } else {
+              console.log(`Preparing to notify app about nickname change for ${msgData.participantId} to ${msgData.nickname}`);
               // Уведомляем приложение об изменении имени другого участника
               if (config?.onNicknameChange) {
+                console.log('onNicknameChange handler is available, calling it now');
                 config.onNicknameChange(msgData.participantId, msgData.nickname);
+              } else {
+                console.error('Missing onNicknameChange handler in mediasoup client config');
               }
             }
             break;

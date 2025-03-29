@@ -688,20 +688,18 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
             // Установка всех возможных content hints для максимальной совместимости
             consumer.track.contentHint = 'motion';
             
-            // Использование нестандартных свойств для максимальной совместимости
-            const constraints = {
-              width: { ideal: 640 },
-              height: { ideal: 480 },
-              frameRate: { ideal: 30 },
-              aspectRatio: { ideal: 1.3333333333 }
-            };
+            // ⚠️ Убрано применение ограничений, так как это вызывает OverconstrainedError
+            // const constraints = {
+            //   width: { ideal: 640 },
+            //   height: { ideal: 480 },
+            //   frameRate: { ideal: 30 },
+            //   aspectRatio: { ideal: 1.3333333333 }
+            // };
             
-            // Попытка применить принудительное ограничение для трека
-            // Это часто помогает "разбудить" трек в некоторых браузерах
-            if (consumer.track.applyConstraints) {
-              consumer.track.applyConstraints(constraints)
-                .catch(e => console.warn('Could not apply constraints:', e));
-            }
+            // if (consumer.track.applyConstraints) {
+            //   consumer.track.applyConstraints(constraints)
+            //     .catch(e => console.warn('Could not apply constraints:', e));
+            // }
             
             // Пробуем изменить ID трека для альтернативной обработки
             if ('id' in consumer.track) {
@@ -714,7 +712,12 @@ async function handleConsumeResponse(data: ConsumeResponse & { transportOptions:
             // Применяем другие нестандартные настройки
             try {
               // @ts-ignore - обходной путь для некоторых браузеров
-              consumer.track._constraints = constraints;
+              consumer.track._constraints = {
+                width: { ideal: 640 },
+                height: { ideal: 480 },
+                frameRate: { ideal: 30 },
+                aspectRatio: { ideal: 1.3333333333 }
+              };
             } catch (e) {}
           } catch (e) {
             console.warn('Enhanced content hints and constraints not supported:', e);

@@ -150,27 +150,50 @@ export async function connect(stream: MediaStream): Promise<void> {
             break;
           case 'nickname-change':
             // Обработка изменения имени участника
-            console.log('Nickname changed:', msgData);
+            console.log('Nickname changed event received');
+            console.log('Raw message data:', message);
+            console.log('Parsed data:', msgData);
             console.log('Full message data object for nickname:', JSON.stringify(msgData, null, 2));
+            
+            // Проверяем структуру данных и делаем ее более устойчивой
+            const remoteParticipantId = msgData.participantId || '';
+            const nickname = msgData.nickname || '';
+            
+            console.log(`Nickname change details: participantId=${remoteParticipantId}, nickname=${nickname}`);
             
             if (msgData.isLocalChange) {
               console.log('This is our own nickname change, skipping external notification');
-            } else {
-              console.log(`Preparing to notify app about nickname change for ${msgData.participantId} to ${msgData.nickname}`);
+            } else if (remoteParticipantId && nickname) {
+              console.log(`Preparing to notify app about nickname change for ${remoteParticipantId} to ${nickname}`);
               // Уведомляем приложение об изменении имени другого участника
               if (config?.onNicknameChange) {
                 console.log('onNicknameChange handler is available, calling it now');
-                config.onNicknameChange(msgData.participantId, msgData.nickname);
+                config.onNicknameChange(remoteParticipantId, nickname);
               } else {
                 console.error('Missing onNicknameChange handler in mediasoup client config');
               }
+            } else {
+              console.error('Invalid nickname change data format:', msgData);
             }
             break;
           case 'participant-killed':
             // Обработка статуса "убит" участника
-            console.log('Participant killed status changed:', msgData);
-            if (msgData.participantId && config?.onParticipantKilled) {
-              config.onParticipantKilled(msgData.participantId, msgData.killed);
+            console.log('Participant killed status changed event received');
+            console.log('Raw message data:', message);
+            console.log('Parsed data:', msgData);
+            console.log('Full message data object for killed status:', JSON.stringify(msgData, null, 2));
+            
+            // Проверяем структуру данных и делаем ее более устойчивой
+            const killedParticipantId = msgData.participantId || '';
+            const killedStatus = !!msgData.killed;
+            
+            console.log(`Killed status details: participantId=${killedParticipantId}, killed=${killedStatus}`);
+            
+            if (killedParticipantId && config?.onParticipantKilled) {
+              console.log(`Notifying app about participant ${killedParticipantId} killed status: ${killedStatus}`);
+              config.onParticipantKilled(killedParticipantId, killedStatus);
+            } else {
+              console.error('Invalid killed status format or missing handler:', msgData);
             }
             break;
           case 'error':

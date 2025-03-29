@@ -1,0 +1,58 @@
+Temporary camera access granted to enumerate devices
+index-D4y2oca2.js:124 Found video devices: (5) [{…}, {…}, {…}, {…}, {…}]
+index-D4y2oca2.js:124 Setting default camera to: 7c0a0bc9705a4808533eb513b7ea03a3accd608695f31f289ae681edecf71882
+index-D4y2oca2.js:124 Disconnected from server
+index-D4y2oca2.js:124 Disconnected from server
+index-D4y2oca2.js:121 VideoGrid: Remote participants updated. Total: 0
+index-D4y2oca2.js:121 VideoGrid: Local stream attached to video element
+index-D4y2oca2.js:124 WebSocket connection established
+index-D4y2oca2.js:124 Sent message to server: join
+index-D4y2oca2.js:124 Received message from server: welcome {type: 'welcome', data: {…}}
+index-D4y2oca2.js:124 Received welcome message with router capabilities
+index-D4y2oca2.js:124 Sending join message with RTP capabilities
+index-D4y2oca2.js:124 Sent message to server: join
+index-D4y2oca2.js:124 Creating video producer with track: Integrated Camera (13d3:56ff) enabled: true readyState: live
+index-D4y2oca2.js:124 Sent message to server: connect-transport
+index-D4y2oca2.js:124 Sent message to server: produce
+index-D4y2oca2.js:124 Received message from server: new-producer {type: 'new-producer', data: {…}}
+index-D4y2oca2.js:124 Received new producer notification: {producerId: 'af70e844-837e-4012-aa61-5a9eaba7a755', participantId: 'user-osypi2oab'}
+index-D4y2oca2.js:124 New producer notification received. Producer ID: af70e844-837e-4012-aa61-5a9eaba7a755, Participant ID: user-osypi2oab
+index-D4y2oca2.js:124 Requesting to consume producer af70e844-837e-4012-aa61-5a9eaba7a755 from participant user-osypi2oab
+index-D4y2oca2.js:124 Sent message to server: request-consume
+index-D4y2oca2.js:124 Received message from server: produce-response {type: 'produce-response', data: {…}}
+index-D4y2oca2.js:124 Received produce response for ID: 43110f68-ae33-44b3-a155-0fbb8f5e9e30
+index-D4y2oca2.js:124 Video producer created successfully with ID: 43110f68-ae33-44b3-a155-0fbb8f5e9e30
+index-D4y2oca2.js:124 Received message from server: consume-response {type: 'consume-response', data: {…}}
+index-D4y2oca2.js:124 Received consume response: 02d0b16b-aff5-4f13-a62b-513974feb38c
+index-D4y2oca2.js:124 Processing consume response for producer af70e844-837e-4012-aa61-5a9eaba7a755 from participant user-osypi2oab
+index-D4y2oca2.js:124 Creating new receive transport for producer af70e844-837e-4012-aa61-5a9eaba7a755
+index-D4y2oca2.js:124 Consuming track with ID 02d0b16b-aff5-4f13-a62b-513974feb38c, producer af70e844-837e-4012-aa61-5a9eaba7a755, kind video
+index-D4y2oca2.js:124 Connecting receive transport fd86b59e-7769-4c4c-86ae-1ff7f51e86ac for producer af70e844-837e-4012-aa61-5a9eaba7a755
+index-D4y2oca2.js:124 Sent message to server: connect-transport
+index-D4y2oca2.js:124 Consumer created with ID 02d0b16b-aff5-4f13-a62b-513974feb38c for producer af70e844-837e-4012-aa61-5a9eaba7a755
+index-D4y2oca2.js:124 Consumer track details - enabled: true, readyState: live, kind: video
+index-D4y2oca2.js:124 Track settings for user-osypi2oab: {deviceId: '02d0b16b-aff5-4f13-a62b-513974feb38c', resizeMode: 'none'}
+index-D4y2oca2.js:124 Applied aggressive security bypass techniques for user-osypi2oab. Video may still appear directly in <video> elements despite restrictions.
+index-D4y2oca2.js:124 Created MediaStream from consumer track, kind: video, active: true
+index-D4y2oca2.js:124 Stream track 0: kind=video, enabled=true, readyState=live
+index-D4y2oca2.js:124 Notifying application about new remote stream from participant user-osypi2oab
+index-D4y2oca2.js:124 Received remote stream from participant user-osypi2oab
+index-D4y2oca2.js:124 Added stream from user-osypi2oab, total streams: 1
+index-D4y2oca2.js:124 Consumer for user-osypi2oab resumed
+index-D4y2oca2.js:121 VideoGrid: Remote participants updated. Total: 1
+index-D4y2oca2.js:121 RemoteVideo: Initial video check for user-osypi2oab
+index-D4y2oca2.js:121 RemoteVideo: Stream for user-osypi2oab - active: true, tracks: 1
+index-D4y2oca2.js:121 RemoteVideo: Track 0 for user-osypi2oab - kind: video, enabled: true, readyState: live
+index-D4y2oca2.js:121 RemoteVideo: Testing canvas capture for user-osypi2oab
+index-D4y2oca2.js:121 RemoteVideo: Video playback started for user-osypi2oab
+index-D4y2oca2.js:121 RemoteVideo: Canvas test for user-osypi2oab - has data: true
+index-D4y2oca2.js:124 Video track status remains enabled for user. Status change sent to server: killed
+index-D4y2oca2.js:124 Sent message to server: participant-killed
+index-D4y2oca2.js:124 User killed status sent to server
+index-D4y2oca2.js:121 RemoteVideo: Canvas test for user-osypi2oab - has data: true
+index-D4y2oca2.js:124 Sending ping to keep connection alive
+index-D4y2oca2.js:124 Changing local nickname for participant user-osypi2oab to 123
+index-D4y2oca2.js:124 Sending ping to keep connection alive
+index-D4y2oca2.js:124 Локальне ім'я змінено на: 321
+index-D4y2oca2.js:124 Sending nickname change message: {"type":"nickname-change","nickname":"321","previousName":"Участник"}
+index-D4y2oca2.js:124 Sent message to server: nickname-change

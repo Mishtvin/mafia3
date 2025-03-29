@@ -479,12 +479,30 @@ function notifyParticipants(room: Room, senderId: string, message: any) {
     if (id !== senderId) {
       console.log(`Sending notification to participant ${id} about ${message.type} from ${senderId}`);
       
-      // Debugging: Проверка структуры сообщения
+      // Debugging: Проверка структуры сообщения и содержимого
       if (message.type === 'nickname-change') {
         console.log(`NICKNAME NOTIFICATION DETAILS - To: ${id}, From: ${senderId}`);
-        console.log(`NICKNAME DATA:`, JSON.stringify(message.data, null, 2));
+        console.log(`NICKNAME DATA BEFORE:`, JSON.stringify(message.data, null, 2));
+        
+        // Убедимся, что данные корректные и содержат participantId
+        if (!message.data.participantId) {
+          console.log('ADDING MISSING participantId TO NICKNAME DATA');
+          message.data.participantId = senderId;
+        }
+        console.log(`NICKNAME DATA AFTER:`, JSON.stringify(message.data, null, 2));
+      } else if (message.type === 'participant-killed') {
+        console.log(`KILLED STATUS NOTIFICATION - To: ${id}, From: ${senderId}`);
+        console.log(`KILLED STATUS DATA BEFORE:`, JSON.stringify(message.data, null, 2));
+        
+        // Убедимся, что данные корректные и содержат participantId
+        if (!message.data.participantId) {
+          console.log('ADDING MISSING participantId TO KILLED STATUS DATA');
+          message.data.participantId = senderId;
+        }
+        console.log(`KILLED STATUS DATA AFTER:`, JSON.stringify(message.data, null, 2));
       }
       
+      // Отправляем сообщение после проверки и коррекции
       sendToClient(participant.socket, message);
       notifiedCount++;
     }

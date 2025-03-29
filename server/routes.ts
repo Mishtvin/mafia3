@@ -120,41 +120,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
           case MessageType.NICKNAME_CHANGE:
             // Обработка изменения имени
             if (currentRoomId && currentRoom) {
-              // Получаем данные из сообщения
-              const nicknameData = data as { nickname: string, previousName?: string };
-              
-              console.log(`Participant ${participantId} changed nickname to: ${nicknameData.nickname}`);
-              
-              // Уведомляем всех остальных участников в комнате
-              // Добавляем подробное логирование для отладки проблемы с изменением имени
-              console.log(`Server: Broadcasting nickname change from ${participantId} to all participants.`);
-              console.log(`Server: New nickname: ${nicknameData.nickname}, previous: ${nicknameData.previousName || 'none'}`);
-              console.log(`Server: Room participants count: ${currentRoom.participants.size}`);
-              
-              // Проверка формата данных
-              const notificationData = {
-                type: 'nickname-change',
-                data: {
-                  participantId,
-                  nickname: nicknameData.nickname,
-                  previousName: nicknameData.previousName
+              try {
+                // Получаем данные из сообщения
+                const nicknameData = data as { nickname: string, previousName?: string };
+                
+                console.log(`Participant ${participantId} changed nickname to: ${nicknameData.nickname}`);
+                
+                // Уведомляем всех остальных участников в комнате
+                // Добавляем подробное логирование для отладки проблемы с изменением имени
+                console.log(`Server: Broadcasting nickname change from ${participantId} to all participants.`);
+                console.log(`Server: New nickname: ${nicknameData.nickname}, previous: ${nicknameData.previousName || 'none'}`);
+                console.log(`Server: Room participants count: ${currentRoom.participants.size}`);
+                
+                // Напрямую отправляем уведомление каждому участнику (без использования notifyParticipants)
+                let notifiedCount = 0;
+                currentRoom.participants.forEach((participant, id) => {
+                  if (id !== participantId && participant.socket.readyState === WebSocket.OPEN) {
+                    console.log(`Server: Directly sending nickname change to ${id}`);
+                    
+                    // Создаем сообщение индивидуально для каждого клиента
+                    const message = JSON.stringify({
+                      type: 'nickname-change',
+                      data: {
+                        participantId: participantId,
+                        nickname: nicknameData.nickname,
+                        previousName: nicknameData.previousName
+                      }
+                    });
+                    
+                    try {
+                      participant.socket.send(message);
+                      notifiedCount++;
+                      console.log(`Server: Successfully sent nickname change to ${id}`);
+                    } catch (e) {
+                      console.error(`Server: Error sending to ${id}:`, e);
+                    }
+                  }
+                });
+                console.log(`Server: Directly notified ${notifiedCount} participants about nickname change`);
+                
+                // Посылаем подтверждение обратно отправителю
+                if (socket.readyState === WebSocket.OPEN) {
+                  const confirmationMessage = JSON.stringify({
+                    type: 'nickname-change',
+                    data: {
+                      participantId,
+                      nickname: nicknameData.nickname,
+                      previousName: nicknameData.previousName,
+                      isLocalChange: true
+                    }
+                  });
+                  
+                  socket.send(confirmationMessage);
+                  console.log(`Server: Sent confirmation back to ${participantId}`);
                 }
-              };
-              
-              console.log(`Server: Notification structure: ${JSON.stringify(notificationData)}`);
-              
-              notifyParticipants(currentRoom, participantId, notificationData);
-              
-              // Посылаем подтверждение обратно отправителю
-              sendToClient(socket, {
-                type: 'nickname-change',
-                data: {
-                  participantId,
-                  nickname: nicknameData.nickname,
-                  previousName: nicknameData.previousName,
-                  isLocalChange: true
-                }
-              });
+              } catch (error) {
+                console.error('Error handling nickname change:', error);
+              }
             }
             break;
             
@@ -199,13 +221,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // что этот участник "убит" и могут отображать соответствующий оверлей
                 
                 // Уведомляем всех остальных участников в комнате
-                notifyParticipants(currentRoom, participantId, {
-                  type: 'participant-killed',
-                  data: {
-                    participantId,
-                    killed: killedData.killed
+                // Напрямую отправляем уведомление каждому участнику (без использования notifyParticipants)
+                let notifiedCount = 0;
+                currentRoom.participants.forEach((participant, id) => {
+                  if (id !== participantId && participant.socket.readyState === WebSocket.OPEN) {
+                    console.log(`Server: Directly sending killed status to ${id}`);
+                    
+                    // Создаем сообщение индивидуально для каждого клиента
+                    const message = JSON.stringify({
+                      type: 'participant-killed',
+                      data: {
+                        participantId: participantId,
+                        killed: killedData.killed
+                      }
+                    });
+                    
+                    try {
+                      participant.socket.send(message);
+                      notifiedCount++;
+                      console.log(`Server: Successfully sent killed status to ${id}, status: ${killedData.killed}`);
+                    } catch (e) {
+                      console.error(`Server: Error sending killed status to ${id}:`, e);
+                    }
                   }
                 });
+                console.log(`Server: Notified ${notifiedCount} participants about killed status change from ${participantId}`);
               }
             }
             break;

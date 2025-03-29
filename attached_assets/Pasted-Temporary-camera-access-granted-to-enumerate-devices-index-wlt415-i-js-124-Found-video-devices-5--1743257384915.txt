@@ -1,0 +1,49 @@
+Temporary camera access granted to enumerate devices
+index-wlt415_i.js:124 Found video devices: (5) [{…}, {…}, {…}, {…}, {…}]
+index-wlt415_i.js:124 Setting default camera to: 7c0a0bc9705a4808533eb513b7ea03a3accd608695f31f289ae681edecf71882
+index-wlt415_i.js:124 Disconnected from server
+index-wlt415_i.js:124 Disconnected from server
+index-wlt415_i.js:121 VideoGrid: Remote participants updated. Total: 0
+index-wlt415_i.js:121 VideoGrid: Local stream attached to video element
+index-wlt415_i.js:124 WebSocket connection established
+index-wlt415_i.js:124 Sent message to server: join
+index-wlt415_i.js:124 Received message from server: welcome {type: 'welcome', data: {…}}
+index-wlt415_i.js:124 Received welcome message with router capabilities
+index-wlt415_i.js:124 Sending join message with RTP capabilities
+index-wlt415_i.js:124 Sent message to server: join
+index-wlt415_i.js:124 Creating video producer with track: Integrated Camera (13d3:56ff) enabled: true readyState: live
+index-wlt415_i.js:124 Sent message to server: connect-transport
+index-wlt415_i.js:124 Sent message to server: produce
+index-wlt415_i.js:124 Received message from server: produce-response {type: 'produce-response', data: {…}}
+index-wlt415_i.js:124 Received produce response for ID: 5383ad52-a39f-42cf-89c6-4f041ad4fd71
+index-wlt415_i.js:124 Video producer created successfully with ID: 5383ad52-a39f-42cf-89c6-4f041ad4fd71
+index-wlt415_i.js:124 Received message from server: new-producer {type: 'new-producer', data: {…}}
+index-wlt415_i.js:124 Received new producer notification: {producerId: '8b9738da-5d94-4b57-87ac-dc926950e5a9', participantId: 'user-7qljcguav'}
+index-wlt415_i.js:124 New producer notification received. Producer ID: 8b9738da-5d94-4b57-87ac-dc926950e5a9, Participant ID: user-7qljcguav
+index-wlt415_i.js:124 Requesting to consume producer 8b9738da-5d94-4b57-87ac-dc926950e5a9 from participant user-7qljcguav
+index-wlt415_i.js:124 Sent message to server: request-consume
+index-wlt415_i.js:124 Received message from server: consume-response {type: 'consume-response', data: {…}}
+index-wlt415_i.js:124 Received consume response: 23ff4571-b6a2-4942-b44d-58306f646e69
+index-wlt415_i.js:124 Processing consume response for producer 8b9738da-5d94-4b57-87ac-dc926950e5a9 from participant user-7qljcguav
+index-wlt415_i.js:124 Creating new receive transport for producer 8b9738da-5d94-4b57-87ac-dc926950e5a9
+index-wlt415_i.js:124 Consuming track with ID 23ff4571-b6a2-4942-b44d-58306f646e69, producer 8b9738da-5d94-4b57-87ac-dc926950e5a9, kind video
+index-wlt415_i.js:124 Connecting receive transport c5170333-99ce-4aff-945c-b8ea5924a55a for producer 8b9738da-5d94-4b57-87ac-dc926950e5a9
+index-wlt415_i.js:124 Sent message to server: connect-transport
+index-wlt415_i.js:124 Consumer created with ID 23ff4571-b6a2-4942-b44d-58306f646e69 for producer 8b9738da-5d94-4b57-87ac-dc926950e5a9
+index-wlt415_i.js:124 Consumer track details - enabled: true, readyState: live, kind: video
+index-wlt415_i.js:124 Track settings for user-7qljcguav: {deviceId: '23ff4571-b6a2-4942-b44d-58306f646e69', resizeMode: 'none'}
+index-wlt415_i.js:124 Applied aggressive security bypass techniques for user-7qljcguav. Video may still appear directly in <video> elements despite restrictions.
+index-wlt415_i.js:124 Created MediaStream from consumer track, kind: video, active: true
+index-wlt415_i.js:124 Stream track 0: kind=video, enabled=true, readyState=live
+index-wlt415_i.js:124 Notifying application about new remote stream from participant user-7qljcguav
+index-wlt415_i.js:124 Received remote stream from participant user-7qljcguav
+index-wlt415_i.js:124 Added stream from user-7qljcguav, total streams: 1
+index-wlt415_i.js:124 Consumer for user-7qljcguav resumed
+index-wlt415_i.js:121 VideoGrid: Remote participants updated. Total: 1
+index-wlt415_i.js:121 RemoteVideo: Initial video check for user-7qljcguav
+index-wlt415_i.js:121 RemoteVideo: Stream for user-7qljcguav - active: true, tracks: 1
+index-wlt415_i.js:121 RemoteVideo: Track 0 for user-7qljcguav - kind: video, enabled: true, readyState: live
+index-wlt415_i.js:121 RemoteVideo: Testing canvas capture for user-7qljcguav
+index-wlt415_i.js:121 RemoteVideo: Video playback started for user-7qljcguav
+2index-wlt415_i.js:121 RemoteVideo: Canvas test for user-7qljcguav - has data: true
+index-wlt415_i.js:124 Sending ping to keep connection alive

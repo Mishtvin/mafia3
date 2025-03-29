@@ -1,0 +1,54 @@
+Temporary camera access granted to enumerate devices
+index-wlt415_i.js:124 Found video devices: Array(5)
+index-wlt415_i.js:124 Setting default camera to: 9824b4d77fac4a4cbcb997cc032db355ca820f3d55a721f0162544b07a64a803
+2index-wlt415_i.js:124 Disconnected from server
+index-wlt415_i.js:121 VideoGrid: Remote participants updated. Total: 0
+index-wlt415_i.js:121 VideoGrid: Local stream attached to video element
+index-wlt415_i.js:124 WebSocket connection established
+index-wlt415_i.js:124 Sent message to server: join
+index-wlt415_i.js:124 Received message from server: welcome Object
+index-wlt415_i.js:124 Received welcome message with router capabilities
+index-wlt415_i.js:124 Sending join message with RTP capabilities
+index-wlt415_i.js:124 Sent message to server: join
+index-wlt415_i.js:124 Creating video producer with track: Integrated Camera (13d3:56ff) enabled: true readyState: live
+index-wlt415_i.js:124 Sent message to server: connect-transport
+index-wlt415_i.js:124 Sent message to server: produce
+index-wlt415_i.js:124 Received message from server: new-producer Object
+index-wlt415_i.js:124 Received new producer notification: Object
+index-wlt415_i.js:124 New producer notification received. Producer ID: 5383ad52-a39f-42cf-89c6-4f041ad4fd71, Participant ID: user-ysx0rc54u
+index-wlt415_i.js:124 Requesting to consume producer 5383ad52-a39f-42cf-89c6-4f041ad4fd71 from participant user-ysx0rc54u
+index-wlt415_i.js:124 Sent message to server: request-consume
+index-wlt415_i.js:124 Received message from server: produce-response Object
+index-wlt415_i.js:124 Received produce response for ID: 8b9738da-5d94-4b57-87ac-dc926950e5a9
+index-wlt415_i.js:124 Video producer created successfully with ID: 8b9738da-5d94-4b57-87ac-dc926950e5a9
+index-wlt415_i.js:124 Received message from server: consume-response Object
+index-wlt415_i.js:124 Received consume response: 5ace5750-5c4e-4137-b2fc-8c58b87f3af7
+index-wlt415_i.js:124 Processing consume response for producer 5383ad52-a39f-42cf-89c6-4f041ad4fd71 from participant user-ysx0rc54u
+index-wlt415_i.js:124 Creating new receive transport for producer 5383ad52-a39f-42cf-89c6-4f041ad4fd71
+index-wlt415_i.js:124 Consuming track with ID 5ace5750-5c4e-4137-b2fc-8c58b87f3af7, producer 5383ad52-a39f-42cf-89c6-4f041ad4fd71, kind video
+index-wlt415_i.js:124 Connecting receive transport acf5354a-a639-412a-9dba-13a6f2724d1c for producer 5383ad52-a39f-42cf-89c6-4f041ad4fd71
+index-wlt415_i.js:124 Sent message to server: connect-transport
+index-wlt415_i.js:124 Consumer created with ID 5ace5750-5c4e-4137-b2fc-8c58b87f3af7 for producer 5383ad52-a39f-42cf-89c6-4f041ad4fd71
+index-wlt415_i.js:124 Consumer track details - enabled: true, readyState: live, kind: video
+index-wlt415_i.js:124 Track settings for user-ysx0rc54u: Object
+index-wlt415_i.js:124 Applied aggressive security bypass techniques for user-ysx0rc54u. Video may still appear directly in <video> elements despite restrictions.
+index-wlt415_i.js:124 Created MediaStream from consumer track, kind: video, active: true
+index-wlt415_i.js:124 Stream track 0: kind=video, enabled=true, readyState=live
+index-wlt415_i.js:124 Notifying application about new remote stream from participant user-ysx0rc54u
+index-wlt415_i.js:124 Received remote stream from participant user-ysx0rc54u
+index-wlt415_i.js:124 Added stream from user-ysx0rc54u, total streams: 1
+index-wlt415_i.js:124 Consumer for user-ysx0rc54u resumed
+index-wlt415_i.js:121 VideoGrid: Remote participants updated. Total: 1
+index-wlt415_i.js:121 RemoteVideo: Initial video check for user-ysx0rc54u
+index-wlt415_i.js:121 RemoteVideo: Stream for user-ysx0rc54u - active: true, tracks: 1
+index-wlt415_i.js:121 RemoteVideo: Track 0 for user-ysx0rc54u - kind: video, enabled: true, readyState: live
+index-wlt415_i.js:121 RemoteVideo: Testing canvas capture for user-ysx0rc54u
+index-wlt415_i.js:121 RemoteVideo: Video playback started for user-ysx0rc54u
+2index-wlt415_i.js:121 RemoteVideo: Canvas test for user-ysx0rc54u - has data: true
+index-wlt415_i.js:124 Video track status remains enabled for user. Status change sent to server: killed
+index-wlt415_i.js:124 Sent message to server: participant-killed
+index-wlt415_i.js:124 User killed status sent to server
+index-wlt415_i.js:124 Локальне ім'я змінено на: цукенгш
+index-wlt415_i.js:124 Sending nickname change message: {"type":"nickname-change","nickname":"цукенгш","previousName":"Участник"}
+index-wlt415_i.js:124 Sent message to server: nickname-change
+index-wlt415_i.js:124 Sending ping to keep connection alive

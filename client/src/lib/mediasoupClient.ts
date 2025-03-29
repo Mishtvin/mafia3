@@ -365,6 +365,8 @@ export function changeNickname(nickname: string): void {
     previousName: previousName
   };
   
+  console.log(`Sending nickname change message: ${JSON.stringify(nicknameChangeMessage)}`);
+  
   // Отправляем сообщение серверу
   sendMessage(nicknameChangeMessage);
 }
@@ -458,10 +460,47 @@ async function handleWelcomeMessage(data: ServerInitResponse): Promise<void> {
     
     // Create video producer with local stream
     if (localStream) {
-      const videoTrack = localStream.getVideoTracks()[0];
-      if (videoTrack) {
-        videoProducer = await producerTransport.produce({ track: videoTrack });
+      try {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+          console.log('Creating video producer with track:', videoTrack.label, 
+                      'enabled:', videoTrack.enabled, 
+                      'readyState:', videoTrack.readyState);
+          
+          // Убедимся, что трек включен
+          videoTrack.enabled = true;
+          
+          // Добавляем более детальные настройки для продюсера
+          videoProducer = await producerTransport.produce({ 
+            track: videoTrack,
+            encodings: [
+              { maxBitrate: 100000, scaleResolutionDownBy: 4 },
+              { maxBitrate: 300000, scaleResolutionDownBy: 2 },
+              { maxBitrate: 900000 }
+            ],
+            codecOptions: {
+              videoGoogleStartBitrate: 1000
+            }
+          });
+          
+          console.log('Video producer created successfully with ID:', videoProducer.id);
+          
+          // Отслеживаем закрытие трека
+          videoTrack.addEventListener('ended', () => {
+            console.log('Local video track ended, recreating it...');
+            if (videoProducer && !videoProducer.closed) {
+              connect(localStream);
+            }
+          });
+        } else {
+          console.warn('No video tracks found in local stream');
+        }
+      } catch (error) {
+        console.error('Failed to create video producer:', error);
+        config?.onError(`Failed to create video producer: ${error.message}`);
       }
+    } else {
+      console.warn('No local stream available for creating producer');
     }
     
     // Mark as connected

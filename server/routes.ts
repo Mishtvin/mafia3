@@ -131,14 +131,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.log(`Server: New nickname: ${nicknameData.nickname}, previous: ${nicknameData.previousName || 'none'}`);
               console.log(`Server: Room participants count: ${currentRoom.participants.size}`);
               
-              notifyParticipants(currentRoom, participantId, {
+              // Проверка формата данных
+              const notificationData = {
                 type: 'nickname-change',
                 data: {
                   participantId,
                   nickname: nicknameData.nickname,
                   previousName: nicknameData.previousName
                 }
-              });
+              };
+              
+              console.log(`Server: Notification structure: ${JSON.stringify(notificationData)}`);
+              
+              notifyParticipants(currentRoom, participantId, notificationData);
               
               // Посылаем подтверждение обратно отправителю
               sendToClient(socket, {

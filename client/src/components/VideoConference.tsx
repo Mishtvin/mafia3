@@ -84,10 +84,18 @@ const VideoConference = () => {
       onNicknameChange: (participantId, nickname) => {
         console.log(`Participant ${participantId} changed nickname to: ${nickname}`);
         
+        // Более детальное логирование для отладки
+        console.log(`VideoConference: Received nickname change notification for ${participantId}`);
+        console.log(`VideoConference: Current nicknames state:`, nicknames);
+        
         // Обновить имя в списке имен глобальных имен (которые установлены другими участниками)
         handleNicknameChange(participantId, nickname);
         
         // Убрали уведомления об изменении имени по требованию
+        console.log(`VideoConference: Updated nicknames state:`, {
+          ...nicknames, 
+          [participantId]: nickname
+        });
       },
       onParticipantKilled: (participantId, isKilled) => {
         console.log(`Participant ${participantId} killed status changed to: ${isKilled}`);

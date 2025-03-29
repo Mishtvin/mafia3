@@ -184,6 +184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 
                 console.log(`Participant ${participantId} is now ${killedData.killed ? 'killed' : 'alive'}`);
                 
+                // Важно: мы НЕ закрываем producer, а просто помечаем участника как "убитого"
+                // Таким образом, видео продолжает транслироваться, но клиенты знают,
+                // что этот участник "убит" и могут отображать соответствующий оверлей
+                
                 // Уведомляем всех остальных участников в комнате
                 notifyParticipants(currentRoom, participantId, {
                   type: 'participant-killed',
@@ -262,6 +266,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   participantId: existingId
                 }
               });
+              
+              // Если существующий участник "убит", сразу отправляем и это уведомление
+              if (existingParticipant.isKilled) {
+                sendToClient(socket, {
+                  type: 'participant-killed',
+                  data: {
+                    participantId: existingId,
+                    killed: true
+                  }
+                });
+                console.log(`Notifying new participant ${participantId} that ${existingId} is killed`);
+              }
             }
           });
           

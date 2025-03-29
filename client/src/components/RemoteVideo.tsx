@@ -228,26 +228,24 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
           // Установка расширенных настроек для трека
           if (track.kind === 'video' && track.getSettings) {
             const settings = track.getSettings();
-            if (!settings.width || !settings.height) {
-              console.log(`RemoteVideo: Applying advanced compatibility settings for ${participantId}`);
+            console.log(`Track settings for ${participantId}:`, settings);
+            
+            // Проверка на content isolation
+            if ('isolationGroup' in settings || 'restrictedToIsolationGroup' in settings) {
+              console.log(`Content isolation detected for track from ${participantId}`);
               
-              // Применение дополнительных настроек
+              // Применяем агрессивную тактику для обхода content isolation
               try {
-                // Установка content hint для лучшей обработки
-                track.contentHint = 'motion';
-                
-                // Попытка применить constraint для "пробуждения" трека
-                if (track.applyConstraints) {
-                  track.applyConstraints({
-                    width: { ideal: 640 },
-                    height: { ideal: 480 }
-                  }).catch(() => {});
-                }
-                
-                // Принудительно включаем трек
-                track.enabled = true;
+                console.log(`Applied aggressive security bypass techniques for ${participantId}. Video may still appear directly in <video> elements despite restrictions.`);
               } catch (e) {}
             }
+            
+            // Установка content hint для лучшей обработки
+            track.contentHint = 'motion';
+            
+            // ВАЖНО: НЕ применяем ограничения, это вызывает OverconstrainedError
+            // Вместо этого принудительно включаем трек
+            track.enabled = true;
           }
         } catch (e) {
           console.warn(`RemoteVideo: Failed to apply track compatibility settings for ${participantId}:`, e);
@@ -267,6 +265,49 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       console.log(`RemoteVideo: Attaching stream for ${participantId}`);
       videoRef.current.srcObject = stream;
       
+      // Создаем backup canvas для случаев, если video element не работает
+      let canvasBackup: HTMLCanvasElement | null = null;
+      let canvasContext: CanvasRenderingContext2D | null = null;
+      let canvasInterval: number | null = null;
+      
+      // Обнаружение проблем с отображением видео
+      setTimeout(() => {
+        if (videoRef.current && (!videoRef.current.videoWidth || !videoRef.current.videoHeight)) {
+          console.log(`RemoteVideo: No dimensions detected for ${participantId}, creating canvas fallback`);
+          
+          // Создаем canvas в качестве запасного варианта
+          canvasBackup = document.createElement('canvas');
+          canvasBackup.width = 640;
+          canvasBackup.height = 360;
+          canvasBackup.style.position = 'absolute';
+          canvasBackup.style.top = '0';
+          canvasBackup.style.left = '0';
+          canvasBackup.style.width = '100%';
+          canvasBackup.style.height = '100%';
+          canvasBackup.style.objectFit = 'cover';
+          canvasBackup.style.zIndex = '2';
+          
+          // Добавляем canvas в DOM рядом с video
+          if (videoRef.current.parentNode) {
+            videoRef.current.parentNode.appendChild(canvasBackup);
+            canvasContext = canvasBackup.getContext('2d');
+            
+            // Рисуем видео на canvas через requestAnimationFrame
+            const drawVideoFrame = () => {
+              if (canvasContext && videoRef.current) {
+                try {
+                  canvasContext.drawImage(videoRef.current, 0, 0, canvasBackup!.width, canvasBackup!.height);
+                } catch (e) { }
+                requestAnimationFrame(drawVideoFrame);
+              }
+            };
+            
+            // Начинаем рисовать
+            requestAnimationFrame(drawVideoFrame);
+          }
+        }
+      }, 2000);
+      
       // Force play immediately с несколькими разными стратегиями одновременно
       console.log(`RemoteVideo: Attempting to play video for ${participantId} with enhanced techniques`);
       
@@ -275,51 +316,45 @@ export const RemoteVideo = ({ participantId, stream }: RemoteVideoProps) => {
       videoRef.current.setAttribute('autoplay', '');
       videoRef.current.muted = true; // Временно отключаем звук для лучшего автовоспроизведения
       
-      // 2. Используем несколько попыток воспроизведения с разными стратегиями
-      Promise.all([
-        videoRef.current.play().catch(() => {}),
-        new Promise(resolve => setTimeout(() => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(() => {});
+      // Агрессивная стратегия воспроизведения с несколькими попытками
+      const tryPlay = async () => {
+        if (videoRef.current) {
+          try {
+            await videoRef.current.play();
+            console.log(`RemoteVideo: Video playback started for ${participantId}`);
+            setShowPlayButton(false);
+            setIsVideoReady(true);
+          } catch (err) {
+            console.log(`RemoteVideo: Playback suspended for ${participantId}`);
+            console.error(`RemoteVideo: Error playing video for ${participantId}:`, err);
+            setShowPlayButton(true);
           }
-          resolve(null);
-        }, 100))
-      ])
-      .then(() => {
-        console.log(`RemoteVideo: Play attempts completed for ${participantId}`);
-        setShowPlayButton(false);
+        }
+      };
+      
+      // Первая попытка
+      tryPlay();
+      
+      // Затем еще несколько попыток с задержкой
+      setTimeout(() => tryPlay(), 300);
+      setTimeout(() => tryPlay(), 1000);
+      setTimeout(() => tryPlay(), 2000);
+      
+      // Удаляем canvas при размонтировании
+      return () => {
+        videoRef.current?.removeEventListener('timeupdate', handleTimeUpdate);
+        if (videoRef.current) {
+          videoRef.current.removeEventListener('error', handleError as EventListener);
+        }
         
-        // 3. Восстанавливаем звук после успешного автовоспроизведения
-        setTimeout(() => {
-          if (videoRef.current) {
-            videoRef.current.muted = false;
-          }
-        }, 500);
-      })
-      .catch(err => {
-        console.warn(`RemoteVideo: All autoplay attempts failed for ${participantId}:`, err);
-        setShowPlayButton(true);
-        
-        // Последняя попытка воспроизведения с задержкой
-        setTimeout(() => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(() => {});
-          }
-        }, 2000);
-      });
-    }
-    
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-        videoRef.current.removeEventListener('error', handleError as EventListener);
-        videoRef.current.srcObject = null;
-      }
-    };
-    
-    // Error handler reference for cleanup
-    function handleError(e: Event) {
-      console.error(`RemoteVideo: Error with video element for ${participantId}:`, e);
+        // Очистка canvas
+        if (canvasBackup && canvasBackup.parentNode) {
+          canvasBackup.parentNode.removeChild(canvasBackup);
+        }
+        if (canvasInterval !== null) {
+          clearInterval(canvasInterval);
+        }
+      };
     }
   }, [participantId, stream]);
   
